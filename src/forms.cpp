@@ -42,6 +42,38 @@ void Form::render()
     glColor3f(col.r, col.g, col.b);
 }
 
+Segment::Segment(Point pt1, Point pt2, Color cl)
+{
+    p1 = pt1;
+    p2 = pt2;
+    direction = Vector(p1, p2);
+    col = cl;
+}
+
+// Segment::Segment(Point pt1, Vector v, Color cl)
+// {
+//     p1 = pt1;
+//     direction = v;
+//     p2 = Point(p1.x + v.x, p1.y + v.y, p1.z + v.z);
+//     col = cl;
+// }
+
+void Segment::render()
+{
+    Form::render();
+
+    glBegin(GL_LINES);
+    {
+        glVertex3d(p1.x, p1.y, p1.z);
+        glVertex3d(p2.x, p2.y, p2.z);
+    }
+    glEnd();
+}
+
+void Segment::update(double delta_t)
+{
+    anim.setPhi(anim.getPhi() + 1);
+}
 
 Sphere::Sphere(double r, Color cl)
 {

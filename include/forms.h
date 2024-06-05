@@ -39,6 +39,19 @@ public:
     virtual void render();
 };
 
+class Segment : public Form
+{
+private:
+    Point p1, p2;
+    Vector direction;
+public:
+    Segment(Point pt1 = Point(), Point pt2 = Point(), Color cl = Color());
+    Point getP1() const {return p1;}
+    Point getP2() const {return p2;}
+    Vector getDirection() const {return direction;}
+    void update(double delta_t);
+    void render();
+};
 
 
 // A particular Form
