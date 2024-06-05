@@ -188,3 +188,10 @@ void Cuboid::render()
     
     glEnd();
 }
+
+Point Cuboid::checkForCollision(Cuboid c)
+{
+    // Collision with another cuboid
+
+
+}

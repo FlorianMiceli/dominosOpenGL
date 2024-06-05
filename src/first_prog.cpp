@@ -268,10 +268,14 @@ int main(int argc, char* args[])
             forms_list[i] = NULL;
         }
 
-        
+
         Cube_face *pFace = NULL;
         pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
         forms_list[number_of_forms] = pFace;
+
+        Cuboid *pCuboid = NULL;
+        pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0.5, 0.5, 0.5), 1, 1, 1, BLUE);
+        forms_list[++number_of_forms] = pCuboid;
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)

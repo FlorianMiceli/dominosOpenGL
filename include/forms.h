@@ -40,6 +40,7 @@ public:
 };
 
 
+
 // A particular Form
 class Sphere : public Form
 {
@@ -81,6 +82,7 @@ public:
           Color cl = Color());
     void update(double delta_t);
     void render();
+    Point checkForCollision(Cuboid c);
     Vector getVdir1() const {return vdir1;}
     Vector getVdir2() const {return vdir2;}
     Vector getVdir3() const {return vdir3;}
