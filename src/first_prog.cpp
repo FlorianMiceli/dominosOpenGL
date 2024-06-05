@@ -1,7 +1,11 @@
+// TP Corrige avec ajout de la gestion des textures
+// For Code::Blocks 20 or higher (gcc/g++ x64)
+// Date: 2022
 // Using SDL, SDL OpenGL and standard IO
 #include <iostream>
 #include <cmath>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_opengl.h>
 #include <GL/GLU.h>
 
@@ -14,15 +18,22 @@
 /***************************************************************************/
 /* Constants and functions declarations                                    */
 /***************************************************************************/
-// Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+
+//permet de changer la taille de l'écran
+const int SCREEN_WIDTH = 768;
+const int SCREEN_HEIGHT = 768;
+
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 10;
 
 // Animation actualization delay (in ms) => 100 updates per second
+//change le temps d'affichage entre deux états
 const Uint32 ANIM_DELAY = 10;
+
+// Render actualization delay 40 (in ms) => 25 updates per second
+//rend plus fluide quand on descend
+const Uint32 FRAME_DELAY = 1;
 
 
 // Starts up SDL, creates window, and initializes OpenGL
@@ -35,10 +46,15 @@ bool initGL();
 void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t);
 
 // Renders scene to the screen
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double angle);
 
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
+
+// Creates a texture into graphic memory from an image file and assign it a
+// unique ID, inside textureID
+// returns 0 if all went fine, a negative value otherwise
+int createTextureFromImage (const char* filename, GLuint* textureID);
 
 
 /***************************************************************************/
@@ -109,18 +125,22 @@ bool initGL()
     glLoadIdentity();
 
     // Set the viewport : use all the window to display the rendered scene
+    //permet de déplacer l'animation (l'origine) dans la fenêtre du port série
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Fix aspect ratio and depth clipping planes
+    //quand on descend le premier paramètre de la fonction on zoom dans la fenêtre
+    // Le troisième paramètre créer un mur devant nous
+    //
     gluPerspective(40.0, (GLdouble)SCREEN_WIDTH/SCREEN_HEIGHT, 1.0, 100.0);
-
 
     // Initialize Modelview Matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     // Initialize clear color : black with no transparency
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
+    // le premier paramètre change la couleur en RGB Rouge vert bleu
+    glClearColor(0.0f, 0.0f, 1.0f, 0.0f );
 
     // Activate Z-Buffer
     glEnable(GL_DEPTH_TEST);
@@ -176,7 +196,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos, double angle)
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -188,7 +208,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
     // Set the camera position and parameters
     gluLookAt(cam_pos.x,cam_pos.y,cam_pos.z, 0.0,0.0,0.0, 0.0,1.0,0.0);
     // Isometric view
-    glRotated(-45, 0, 1, 0);
+    glRotated(angle, 0, 1, 0);
     glRotated(30, 1, 0, -1);
 
     // X, Y and Z axis
@@ -231,6 +251,47 @@ void close(SDL_Window** window)
 }
 
 
+int createTextureFromImage (const char* filename, GLuint* textureID)
+{
+    SDL_Surface *imgSurface = IMG_Load(filename);
+    if (imgSurface == NULL)
+    {
+        std::cerr << "Failed to load texture image: " << filename << std::endl;
+        return -1;
+    }
+    else
+    {
+        // Work out what format to tell glTexImage2D to use...
+        int mode;
+        if (imgSurface->format->BytesPerPixel == 3)   // RGB 24bit
+        {
+            mode = GL_RGB;
+        }
+        else
+        {
+            SDL_FreeSurface(imgSurface);
+            std::cerr << "Unable to detect the image color format of: " << filename << std::endl;
+            return -2;
+        }
+        // create one texture name
+        glGenTextures(1, textureID);
+
+        // tell opengl to use the generated texture name
+        glBindTexture(GL_TEXTURE_2D, *textureID);
+
+        // this reads from the sdl imgSurface and puts it into an openGL texture
+        glTexImage2D(GL_TEXTURE_2D, 0, mode, imgSurface->w, imgSurface->h, 0, mode, GL_UNSIGNED_BYTE, imgSurface->pixels);
+
+        // these affect how this texture is drawn later on...
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+        // clean up
+        SDL_FreeSurface(imgSurface);
+        return 0;
+    }
+}
+
 /***************************************************************************/
 /* MAIN Function                                                           */
 /***************************************************************************/
@@ -252,13 +313,22 @@ int main(int argc, char* args[])
     {
         // Main loop flag
         bool quit = false;
-        Uint32 current_time, previous_time, elapsed_time;
+        Uint32 current_time, previous_time_anim, previous_time_render, elapsed_time_anim, elapsed_time_render;
 
         // Event handler
         SDL_Event event;
 
         // Camera position
-        Point camera_position(0, 0.0, 5.0);
+        double hCam = 0;
+        double rho = -45;
+        Point camera_position;
+
+        // Textures creation //////////////////////////////////////////////////////////
+        GLuint textureid_1, textureid_2;
+        createTextureFromImage("resources/images/photo_domino.jpg", &textureid_1);
+        createTextureFromImage("resources/images/tiles.bmp", &textureid_2);
+        // Textures ready to be enabled (with private member " texture_id" of each form)
+
 
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
@@ -270,12 +340,52 @@ int main(int argc, char* args[])
         // Create here specific forms and add them to the list...
         // Don't forget to update the actual number_of_forms !
         Cube_face *pFace = NULL;
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE); // For the cube
+        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0.5, 0, 0.5), 1, 1, WHITE); // For the animation
+        pFace->setTexture(textureid_1);
         forms_list[number_of_forms] = pFace;
+        number_of_forms++;
+//        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, 0.5), 1, 1, RED);
+//        forms_list[number_of_forms] = pFace;
+//        number_of_forms++;
+//        pFace = new Cube_face(Vector(1,0,0), Vector(0,0,1), Point(-0.5, -0.5, -0.5), 1, 1, BLUE);
+//        forms_list[number_of_forms] = pFace;
+//        number_of_forms++;
+//        pFace = new Cube_face(Vector(1,0,0), Vector(0,0,1), Point(-0.5, 0.5, -0.5), 1, 1, YELLOW);
+//        forms_list[number_of_forms] = pFace;
+//        number_of_forms++;
+//        pFace = new Cube_face(Vector(0,1,0), Vector(0,0,1), Point(-0.5, -0.5, -0.5), 1, 1, WHITE);
+//        forms_list[number_of_forms] = pFace;
+//        number_of_forms++;
+//        pFace = new Cube_face(Vector(0,1,0), Vector(0,0,1), Point(0.5, -0.5, -0.5), 1, 1, GREEN);
+//        forms_list[number_of_forms] = pFace;
+//        number_of_forms++;
+
+        // Spheres
+        Sphere* pSphere = NULL;
+        Animation sphAnim;
+        pSphere = new Sphere(0.4, WHITE);
+        sphAnim.setPos(Point(1.5,0,0));
+        sphAnim.setPhi(0.1); // angle en degre
+        sphAnim.setTheta(0.2); // angle en degre
+        sphAnim.setSpeed(Vector(-0.1,0,0)); // v initiale colineaire a Ox
+        pSphere->setAnim(sphAnim);
+        pSphere->setTexture(textureid_1);
+        pSphere->getAnim().setPhi(10);
+        forms_list[number_of_forms] = pSphere;
+        number_of_forms++;
+
+        pSphere = new Sphere(0.3, RED);
+        Animation sphAnim2;
+        sphAnim2.setPos(Point(1,1,0));
+        sphAnim2.setSpeed(Vector(0,0,0)); // v initiale dans plan x0y
+        pSphere->setAnim(sphAnim2);
+        pSphere->setTexture(textureid_2);
+        forms_list[number_of_forms] = pSphere;
         number_of_forms++;
 
         // Get first "current time"
-        previous_time = SDL_GetTicks();
+        previous_time_anim = previous_time_render = SDL_GetTicks();
         // While application is running
         while(!quit)
         {
@@ -302,7 +412,18 @@ int main(int argc, char* args[])
                     case SDLK_ESCAPE:
                         quit = true;
                         break;
-
+                    case SDLK_z:
+                        hCam += 0.5;
+                        break;
+                    case SDLK_s:
+                        hCam -= 0.5;
+                        break;
+                    case SDLK_o:
+                        rho += 5;
+                        break;
+                    case SDLK_p:
+                        rho -= 5;
+                        break;
                     default:
                         break;
                     }
@@ -314,18 +435,26 @@ int main(int argc, char* args[])
 
             // Update the scene
             current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
-            elapsed_time = current_time - previous_time;
-            if (elapsed_time > ANIM_DELAY)
+            elapsed_time_anim = current_time - previous_time_anim;
+            elapsed_time_render = current_time - previous_time_render;
+
+            if (elapsed_time_anim > ANIM_DELAY)
             {
-                previous_time = current_time;
-                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+                previous_time_anim = current_time;
+                update(forms_list, 1e-3 * elapsed_time_anim); // International system units : seconds
             }
 
             // Render the scene
-            render(forms_list, camera_position);
+            camera_position = Point(0, hCam, 5);
 
-            // Update window screen
-            SDL_GL_SwapWindow(gWindow);
+            if (elapsed_time_render > FRAME_DELAY)
+            {
+                previous_time_render = current_time;
+                render(forms_list, camera_position, rho);
+
+                // Update window screen
+                SDL_GL_SwapWindow(gWindow);
+            }
         }
     }
 
