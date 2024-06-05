@@ -88,8 +88,6 @@ public:
     double getLength() const {return length;}
     double getWidth() const {return width;}
     double getHeight() const {return height;}
-    void update(double delta_t);
-    void render();
 };
 
 #endif // FORMS_H_INCLUDED
