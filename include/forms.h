@@ -69,7 +69,27 @@ public:
     void update(double delta_t);
     void render();
 };
-
-//hfruids
+class Cuboid : public Form
+{
+private:
+    Vector vdir1, vdir2, vdir3;
+    double length, width, height;
+    Point org;
+public:
+    Cuboid(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
+          Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+          Color cl = Color());
+    void update(double delta_t);
+    void render();
+    Vector getVdir1() const {return vdir1;}
+    Vector getVdir2() const {return vdir2;}
+    Vector getVdir3() const {return vdir3;}
+    Point getOrigin() const {return org;}
+    double getLength() const {return length;}
+    double getWidth() const {return width;}
+    double getHeight() const {return height;}
+    void update(double delta_t);
+    void render();
+};
 
 #endif // FORMS_H_INCLUDED

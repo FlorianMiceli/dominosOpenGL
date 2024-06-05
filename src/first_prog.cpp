@@ -267,12 +267,20 @@ int main(int argc, char* args[])
         {
             forms_list[i] = NULL;
         }
-        // Create here specific forms and add them to the list...
-        // Don't forget to update the actual number_of_forms !
+
+        
         Cube_face *pFace = NULL;
         pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
         forms_list[number_of_forms] = pFace;
-        number_of_forms++;
+
+
+        for (i=0; i<MAX_FORMS_NUMBER; i++)
+        {
+            if (forms_list[i] != NULL)
+            {
+                number_of_forms++;
+            }
+        }
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
