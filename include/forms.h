@@ -76,13 +76,19 @@ class Cube_face : public Form
 private:
     Vector vdir1, vdir2;
     double length, width;
+    Point org;
 public:
-    Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
-          Point org = Point(), double l = 1.0, double w = 1.0,
-          Color cl = Color());
+    Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,1,0),
+              Point org = Point(), double l = 1.0, double w = 1.0, Color cl = Color());
+          Point checkForCollision(Segment s);
+    double getLength() const {return length;}
+    double getWidth() const {return width;}
+    Point getCenter();
     void update(double delta_t);
     void render();
 };
+
+// A cuboid (for dominoes)
 class Cuboid : public Form
 {
 private:

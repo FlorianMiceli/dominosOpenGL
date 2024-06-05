@@ -39,6 +39,16 @@ Vector Vector::integral(double delta_t)
     return res;
 }
 
+Vector Vector::cross(const Vector &v)
+{
+    Vector res;
+
+    res.x = y * v.z - z * v.y;
+    res.y = z * v.x - x * v.z;
+    res.z = x * v.y - y * v.x;
+
+    return res;
+}
 
 void Vector::operator+=(const Vector &v)
 {

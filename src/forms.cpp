@@ -140,6 +140,99 @@ void Cube_face::render()
     glEnd();
 }
 
+Point Cube_face::getCenter()
+{
+    return Point(anim.getPos().x + 0.5 * length * vdir1.x + 0.5 * width * vdir2.x,
+                 anim.getPos().y + 0.5 * length * vdir1.y + 0.5 * width * vdir2.y,
+                 anim.getPos().z + 0.5 * length * vdir1.z + 0.5 * width * vdir2.z);
+}
+
+Point Cube_face::checkForCollision(Segment s)
+{
+    // Collision with a segment
+    
+    // get segment endpoints
+    Point p1 = s.getP1();
+    Point p2 = s.getP2();
+
+    // get cube face information
+    Point org = anim.getPos();
+    Point face_center = this->getCenter();
+    Vector v1 = vdir1;
+    Vector v2 = vdir2;
+    double l = length;
+    double w = width;
+    
+    // calculate plane equation of the face
+    Vector n = v1.cross(v2);
+    //If n=(a,b,c), the plane equation is ax+by+cz+d=0ax+by+cz+d=0.
+    double d = -n.x * face_center.x - n.y * face_center.y - n.z * face_center.z;
+    //Thus, the plane equation becomes:ax+by+cz+d=0
+
+    // Check if the Segment Intersects the Plane:
+    /*Evaluate the plane equation at the segment endpoints:
+    F(P1​)=a⋅x1​+b⋅y1​+c⋅z1​+d
+    F(P2​)=a⋅x2​+b⋅y2​+c⋅z2​+d*/
+    std::cout << "n = " << n << ", d = " << d << std::endl;
+    double f_p1 = n.x * p1.x + n.y * p1.y + n.z * p1.z + d;
+    double f_p2 = n.x * p2.x + n.y * p2.y + n.z * p2.z + d;
+
+    // If F(P1)F(P1​) and F(P2)F(P2​) have opposite signs OR if one of them = 0, the segment intersects the plane. Otherwise, it does not.
+    if (f_p1 * f_p2 >= 0)
+    {
+        if (f_p1 == 0)
+        {
+            return p1;
+        }
+        else if (f_p2 == 0)
+        {
+            return p2;
+        }
+        else
+        {
+            return Point();
+        }
+    }
+
+    /*Find the Intersection Point:
+    If there is an intersection, find the parameter tt where the segment intersects the plane:
+    t=−F(P1)F(P2)−F(P1)*/
+    
+    double t = -f_p1 / (f_p2 - f_p1);
+
+    /*Compute the intersection point P(t)P(t):
+    P(t)=P1​+t(P2​−P1​)*/
+    Point intersection = Point(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y), p1.z + t * (p2.z - p1.z));
+
+    /*Check if the Intersection Point Lies Within the Cube Face:
+
+    Express the intersection point in terms of the face’s local coordinate system:
+        Local coordinates relative to the center CC:
+        Plocal=P(t)−C=(xlocal,ylocal,zlocal)*/
+    Point p_local = Point(intersection.x - face_center.x, intersection.y - face_center.y, intersection.z - face_center.z);
+
+    //Project onto the direction vectors:
+        //u=Plocal​⋅vdir1
+        //v=Plocal⋅vdir2
+    double u = p_local.x * v1.x + p_local.y * v1.y + p_local.z * v1.z;
+    double v = p_local.x * v2.x + p_local.y * v2.y + p_local.z * v2.z;
+
+    std::cout << "intersection point: " << intersection << std::endl;
+
+    //Check if uu and vv lie within half the length and width:
+    //−2L ​≤ u ≤ 2L​ and −2W ​≤ v ≤ 2W​ */
+    if (u >= -0.5 * l && u <= 0.5 * l && v >= -0.5 * w && v <= 0.5 * w)
+    {
+        // intersection point lies within the face
+        return intersection;
+    }
+    else
+    {
+        // intersection point lies outside the face
+        return Point();
+    }
+}
+
 Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h, Color cl)
 {
     vdir1 = 1.0 / v1.norm() * v1;
@@ -225,5 +318,5 @@ Point Cuboid::checkForCollision(Cuboid c)
 {
     // Collision with another cuboid
 
-
 }
+

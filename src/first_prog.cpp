@@ -270,7 +270,7 @@ int main(int argc, char* args[])
 
 
         Cube_face *pFace = NULL;
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0, 0, 0), 1, 1, RED);
         forms_list[number_of_forms] = pFace;
 
         // Cuboid *pCuboid = NULL;
@@ -281,6 +281,17 @@ int main(int argc, char* args[])
         pSegment = new Segment(Point(0, 0, 0), Point(1, 1, 1), GREEN);
         forms_list[++number_of_forms] = pSegment;
 
+
+        //test for Cube_face::checkForCollision(Segment s)
+        Point p1 = Point(0, 0, 0);
+        Point p2 = Point(1, 1, 1);
+        Point p3 = Point(0, 1, 0);
+        Point p4 = Point(1, 0, 1);
+        Segment s(p1, p2, YELLOW);
+        Cube_face cf(Vector(1,0,0), Vector(0,1,0), Point(0, 0, 0), 1, 1, RED);
+        // center of the face
+        Point collision = cf.checkForCollision(s);
+        std::cout << "Collision point : " << collision << std::endl;
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
         {

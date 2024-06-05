@@ -29,12 +29,12 @@ class Vector : public Coordinates
 public:
     // Instantiates a Vector from its coordinates
     Vector(double xx=0, double yy=0, double zz=0) : Coordinates(xx, yy, zz) {}
-    // Or with two points
     Vector(Point, Point);
-    // Compute the vector norm
+
     double norm();
     Vector integral(double delta_t);
-    // Overloaded standard operators
+    Vector cross(const Vector &v);
+
     void operator+=(const Vector &v);
 };
 
