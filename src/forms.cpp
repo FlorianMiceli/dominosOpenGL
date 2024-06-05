@@ -94,8 +94,6 @@ Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, d
 
 void Cuboid::update(double delta_t)
 {
-    anim.setPhi(anim.getPhi() + 0);
-    anim.setTheta(anim.getTheta() + 0);
     gravity(delta_t, anim);
     solid(anim);
 }

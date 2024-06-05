@@ -262,13 +262,20 @@ int main(int argc, char *args[])
         // Don't forget to update the actual number_of_forms !
         Cube_face *pFace = NULL;
         Sphere *pSphere = NULL;
+        Cuboid *pCuboid = NULL;
+        Cuboid *pCuboid2 = NULL;
         pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, WHITE);
         forms_list[number_of_forms] = pFace;
         number_of_forms++;
         pSphere = new Sphere(0.2, Point(0, 5, 0), RED);
         forms_list[number_of_forms] = pSphere;
         number_of_forms++;
-        
+        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 0, 0), 1, 3, 2, BLUE);
+        forms_list[number_of_forms] = pCuboid;
+        number_of_forms++;
+        pCuboid2 = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 6, 0), 1, 3, 2, GREEN);
+        forms_list[number_of_forms] = pCuboid2;
+        number_of_forms++;
 
         // Get first "current time"
         previous_time = SDL_GetTicks();

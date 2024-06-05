@@ -1,8 +1,7 @@
 #ifndef PHYSICS_H_INCLUDED
 #define PHYSICS_H_INCLUDED
 
-#include "geometry.h"
-#include "animation.h"
+
 
 void gravity(double delta_t, Animation &anim)
 {
@@ -24,15 +23,5 @@ void solid(Animation &anim)
         anim.setPos(Point(anim.getPos().x, -anim.getPos().y * 0.3, anim.getPos().z));
     }
 }
-
-// void checkCollision(Cuboid &c1, Cuboid &c2)
-// {
-//     return (c1.getPos().x < c2.getPos().x + c2.getSize().x &&
-//             c1.getPos().x + c1.getSize().x > c2.getPos().x &&
-//             c1.getPos().y < c2.getPos().y + c2.getSize().y &&
-//             c1.getPos().y + c1.getSize().y > c2.getPos().y &&
-//             c1.getPos().z < c2.getPos().z + c2.getSize().z &&
-//             c1.getPos().z + c1.getSize().z > c2.getPos().z);
-// }
 
 #endif // PHYSICS_H_INCLUDED
