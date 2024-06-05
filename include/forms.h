@@ -70,4 +70,6 @@ public:
     void render();
 };
 
+//hfruids
+
 #endif // FORMS_H_INCLUDED
