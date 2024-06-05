@@ -114,7 +114,7 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 void Cube_face::update(double delta_t)
 {
     anim.setPhi(anim.getPhi() + 1);
-    gravity(delta_t, anim);
+    // gravity(delta_t, anim);
     solid(anim);
 }
 
@@ -316,7 +316,67 @@ void Cuboid::render()
 
 Point Cuboid::checkForCollision(Cuboid c)
 {
-    // Collision with another cuboid
 
+}
+
+Cube_face Cuboid::getFace(int i)
+{
+    // Return the ith face of the cuboid
+    // 0: right face, 1: left face, 2: back face, 3: front face, 4: bottom face, 5: top face
+    Point org = anim.getPos();
+    switch (i)
+    {
+    case 0:
+        return Cube_face(vdir1, vdir2, Point(org.x, org.y, org.z), length, width, col); //right face
+    case 1:
+        return Cube_face(vdir1, vdir2, Point(org.x, org.y, org.z+height), length, width, col); //left face
+    case 2:
+        return Cube_face(vdir2, vdir3, Point(org.x, org.y, org.z), width, height, col); //back face
+    case 3:
+        return Cube_face(vdir2, vdir3, Point(org.x+length, org.y, org.z), width, height, col); //front face
+    case 4:
+        return Cube_face(vdir1, vdir3, Point(org.x, org.y, org.z), length, height, col); //bottom face
+    case 5:
+        return Cube_face(vdir1, vdir3, Point(org.x, org.y+width, org.z), length, height, col); //top face
+    default:
+        break;
+    }
+}
+
+Segment Cuboid::getSegment(int i)
+{
+    // Return the ith segment of the cuboid
+    //show vdir1, vdir2, vdir3, length, width, height
+    switch (i)
+    {
+    
+    case 0:
+        return Segment(anim.getPos(), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), col); // bottom right 
+    case 1:
+        return Segment(anim.getPos(), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // back right
+    case 2:
+        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // top right
+    case 3:
+        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // front right
+    case 4:
+        return Segment(Point(anim.getPos()), Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), col); // bottom back
+    case 5:
+        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // back top
+    case 6:
+        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // top front
+    case 7:
+        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // top left
+    case 8:
+        return Segment(Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // back left
+    case 9:
+        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // front left
+    case 10:
+        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // bottom front
+    case 11:
+        return Segment(Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // bottom left
+    
+    default:
+        break;
+    }
 }
 

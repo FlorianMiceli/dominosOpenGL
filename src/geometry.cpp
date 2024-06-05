@@ -9,6 +9,27 @@ void Point::translate(const Vector &v)
     z += v.z;
 }
 
+Point Point::translate2(const Vector &v) const
+{
+   Point res = *this;
+
+    res.x += v.x;
+    res.y += v.y;
+    res.z += v.z;
+
+    return res;
+}
+
+Point Point::operator+(const Vector &v)
+{
+    Point res = *this;
+
+    res.x += v.x;
+    res.y += v.y;
+    res.z += v.z;
+
+    return res;
+}
 
 Vector::Vector(Point p1, Point p2)
 {
@@ -133,6 +154,17 @@ Vector operator^(const Vector &v1, const Vector &v2)
     res.x = v1.y * v2.z - v1.z * v2.y;
     res.y = v1.z * v2.x - v1.x * v2.z;
     res.z = v1.x * v2.y - v1.y * v2.x;
+
+    return res;
+}
+
+Point operator+(const Point &p, const Vector &v)
+{
+    Point res = p;
+
+    res.x += v.x;
+    res.y += v.y;
+    res.z += v.z;
 
     return res;
 }

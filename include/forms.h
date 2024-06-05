@@ -80,7 +80,7 @@ private:
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,1,0),
               Point org = Point(), double l = 1.0, double w = 1.0, Color cl = Color());
-          Point checkForCollision(Segment s);
+    Point checkForCollision(Segment s);
     double getLength() const {return length;}
     double getWidth() const {return width;}
     Point getCenter();
@@ -109,6 +109,8 @@ public:
     double getLength() const {return length;}
     double getWidth() const {return width;}
     double getHeight() const {return height;}
+    Cube_face getFace(int i);
+    Segment getSegment(int i);
 };
 
 #endif // FORMS_H_INCLUDED
