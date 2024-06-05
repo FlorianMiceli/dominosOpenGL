@@ -2,6 +2,7 @@
 #include "geometry.h"
 
 
+
 void Point::translate(const Vector &v)
 {
     x += v.x;

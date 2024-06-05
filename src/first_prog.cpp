@@ -18,22 +18,20 @@
 /***************************************************************************/
 /* Constants and functions declarations                                    */
 /***************************************************************************/
-
-//permet de changer la taille de l'écran
-const int SCREEN_WIDTH = 768;
+// Screen dimension constants
+const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
-
+//const int SCREEN_WIDTH = 640;
+//const int SCREEN_HEIGHT = 480;
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 10;
 
 // Animation actualization delay (in ms) => 100 updates per second
-//change le temps d'affichage entre deux états
 const Uint32 ANIM_DELAY = 10;
 
 // Render actualization delay 40 (in ms) => 25 updates per second
-//rend plus fluide quand on descend
-const Uint32 FRAME_DELAY = 1;
+const Uint32 FRAME_DELAY = 1000;
 
 
 // Starts up SDL, creates window, and initializes OpenGL
@@ -125,13 +123,9 @@ bool initGL()
     glLoadIdentity();
 
     // Set the viewport : use all the window to display the rendered scene
-    //permet de déplacer l'animation (l'origine) dans la fenêtre du port série
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Fix aspect ratio and depth clipping planes
-    //quand on descend le premier paramètre de la fonction on zoom dans la fenêtre
-    // Le troisième paramètre créer un mur devant nous
-    //
     gluPerspective(40.0, (GLdouble)SCREEN_WIDTH/SCREEN_HEIGHT, 1.0, 100.0);
 
     // Initialize Modelview Matrix
@@ -139,8 +133,7 @@ bool initGL()
     glLoadIdentity();
 
     // Initialize clear color : black with no transparency
-    // le premier paramètre change la couleur en RGB Rouge vert bleu
-    glClearColor(0.0f, 0.0f, 1.0f, 0.0f );
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f );
 
     // Activate Z-Buffer
     glEnable(GL_DEPTH_TEST);
@@ -267,6 +260,10 @@ int createTextureFromImage (const char* filename, GLuint* textureID)
         {
             mode = GL_RGB;
         }
+        else if (imgSurface->format->BytesPerPixel == 4)     // RGBA 32bit
+        {
+            mode = GL_RGBA;
+        }
         else
         {
             SDL_FreeSurface(imgSurface);
@@ -325,7 +322,7 @@ int main(int argc, char* args[])
 
         // Textures creation //////////////////////////////////////////////////////////
         GLuint textureid_1, textureid_2;
-        createTextureFromImage("resources/images/photo_domino.jpg", &textureid_1);
+        createTextureFromImage("resources/images/earth_texture.jpg", &textureid_1);
         createTextureFromImage("resources/images/tiles.bmp", &textureid_2);
         // Textures ready to be enabled (with private member " texture_id" of each form)
 
@@ -341,10 +338,15 @@ int main(int argc, char* args[])
         // Don't forget to update the actual number_of_forms !
         Cube_face *pFace = NULL;
         pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE); // For the cube
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0.5, 0, 0.5), 1, 1, WHITE); // For the animation
+        //pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0.5, 0, 0.5), 1, 1, WHITE); // For the animation
         pFace->setTexture(textureid_1);
-        forms_list[number_of_forms] = pFace;
+        forms_list[0] = pFace;
         number_of_forms++;
+
+        Cuboid *pCuboid = NULL;
+        pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0.5, 0.5, 0.5), 1, 1, 1, BLUE);
+        pCuboid->setTexture(textureid_1);
+        forms_list[1] = pCuboid;
 //        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, 0.5), 1, 1, RED);
 //        forms_list[number_of_forms] = pFace;
 //        number_of_forms++;
@@ -378,7 +380,7 @@ int main(int argc, char* args[])
         pSphere = new Sphere(0.3, RED);
         Animation sphAnim2;
         sphAnim2.setPos(Point(1,1,0));
-        sphAnim2.setSpeed(Vector(0,0,0)); // v initiale dans plan x0y
+        sphAnim2.setSpeed(Vector(-0.2,-0.2,0)); // v initiale dans plan x0y
         pSphere->setAnim(sphAnim2);
         pSphere->setTexture(textureid_2);
         forms_list[number_of_forms] = pSphere;
