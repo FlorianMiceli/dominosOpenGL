@@ -37,6 +37,7 @@ public:
     Vector integral(double delta_t);
     Vector cross(const Vector &v);
     void operator+=(const Vector &v);
+    float dot(const Vector& v) const {return x * v.x + y * v.y + z * v.z;}
 };
 
 
@@ -55,5 +56,7 @@ double operator*(const Vector &v1, const Vector &v2);
 Vector operator^(const Vector &v1, const Vector &v2);
 
 Point operator+(const Point &p, const Vector &v);
+
+Vector operator/(const Vector &v, const double &k);
 
 #endif // GEOMETRY_H_INCLUDED

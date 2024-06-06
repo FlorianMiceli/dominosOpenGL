@@ -3,6 +3,7 @@
 
 #include "geometry.h"
 #include "animation.h"
+#include <vector>
 
 
 class Color
@@ -19,6 +20,7 @@ const Color GREEN(0.0f, 1.0f, 0.0f);
 const Color YELLOW(1.0f, 1.0f, 0.0f);
 const Color WHITE(1.0f, 1.0f, 1.0f);
 const Color ORANGE(1.0f, 0.65f, 0.0f);
+const Color PURPLE(0.5f, 0.0f, 0.5f);
 
 
 // Generic class to render and animate an object
@@ -37,6 +39,80 @@ public:
     virtual void update(double delta_t) = 0;
     // Virtual method : Form is a generic type, only setting color and reference position
     virtual void render();
+};
+
+class Matrix3x3
+{
+private:
+    double elements[3][3];
+
+public:
+    // Default constructor initializes to identity matrix
+    Matrix3x3()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                elements[i][j] = (i == j) ? 1.0 : 0.0;
+            }
+        }
+    }
+
+    // Constructor that takes a 2D array to initialize the matrix
+    Matrix3x3(double init[3][3])
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                elements[i][j] = init[i][j];
+            }
+        }
+    }
+
+    // Getter for the elements of the matrix
+    double get(int i, int j) const
+    {
+        return elements[i][j];
+    }
+
+    // Setter for the elements of the matrix
+    void set(int i, int j, double value)
+    {
+        elements[i][j] = value;
+    }
+
+    // Matrix inversion
+    Matrix3x3 inverse() const
+    {
+        double det = elements[0][0] * (elements[1][1] * elements[2][2] - elements[1][2] * elements[2][1])
+                   - elements[0][1] * (elements[1][0] * elements[2][2] - elements[1][2] * elements[2][0])
+                   + elements[0][2] * (elements[1][0] * elements[2][1] - elements[1][1] * elements[2][0]);
+
+        double invdet = 1.0 / det;
+
+        double inv[3][3];
+        inv[0][0] = (elements[1][1] * elements[2][2] - elements[1][2] * elements[2][1]) * invdet;
+        inv[0][1] = (elements[0][2] * elements[2][1] - elements[0][1] * elements[2][2]) * invdet;
+        inv[0][2] = (elements[0][1] * elements[1][2] - elements[0][2] * elements[1][1]) * invdet;
+        inv[1][0] = (elements[1][2] * elements[2][0] - elements[1][0] * elements[2][2]) * invdet;
+        inv[1][1] = (elements[0][0] * elements[2][2] - elements[0][2] * elements[2][0]) * invdet;
+        inv[1][2] = (elements[1][0] * elements[0][2] - elements[0][0] * elements[1][2]) * invdet;
+        inv[2][0] = (elements[1][0] * elements[2][1] - elements[2][0] * elements[1][1]) * invdet;
+        inv[2][1] = (elements[2][0] * elements[0][1] - elements[0][0] * elements[2][1]) * invdet;
+        inv[2][2] = (elements[0][0] * elements[1][1] - elements[1][0] * elements[0][1]) * invdet;
+    }
+
+    // Matrix multiplication by vector
+    Vector operator*(const Vector &v) const
+    {
+        double x = elements[0][0] * v.x + elements[0][1] * v.y + elements[0][2] * v.z;
+        double y = elements[1][0] * v.x + elements[1][1] * v.y + elements[1][2] * v.z;
+        double z = elements[2][0] * v.x + elements[2][1] * v.y + elements[2][2] * v.z;
+
+        return Vector(x, y, z);
+    }
 };
 
 class Segment : public Form
@@ -86,6 +162,7 @@ public:
     Point getCenter();
     void update(double delta_t);
     void render();
+    Vector getNormal();
 };
 
 // A cuboid (for dominoes)
@@ -101,7 +178,7 @@ public:
           Color cl = Color());
     void update(double delta_t);
     void render();
-    Point checkForCollision(Cuboid c);
+    Point checkForCollision(Cuboid c, int &ri, int &rj);
     Vector getVdir1() const {return vdir1;}
     Vector getVdir2() const {return vdir2;}
     Vector getVdir3() const {return vdir3;}
@@ -113,4 +190,53 @@ public:
     Segment getSegment(int i);
 };
 
-#endif // FORMS_H_INCLUDED
+class Domino : public Cuboid
+{
+private:
+    double mass;
+    Vector velocity;
+    Vector angularVelocity;
+    Matrix3x3 momentOfInertia;
+    Point position;
+    double theta;
+    double phi;
+    double frictionCoefficient;
+
+public:
+    Domino(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
+           Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+           Color cl = Color(), double m = 1.0, Vector v = Vector(), Vector omega = Vector(),
+           Matrix3x3 I = Matrix3x3(), Point pos = Point(), double t = 0.0, double p = 0.0,
+           double mu = 0.0)
+        : Cuboid(v1, v2, v3, org, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
+          momentOfInertia(I), position(pos), theta(t), phi(p), frictionCoefficient(mu) {}
+
+    double getMass() const { return mass; }
+    Vector getVelocity() const { return velocity; }
+    Vector getAngularVelocity() const { return angularVelocity; }
+    Matrix3x3 getMomentOfInertia() const { return momentOfInertia; }
+    Point getPosition() const { return position; }
+    double getTheta() const { return theta; }
+    double getPhi() const { return phi; }
+    double getFrictionCoefficient() const { return frictionCoefficient; }
+
+    void setMass(double m) { mass = m; }
+    void setVelocity(Vector v) { velocity = v; }
+    void setAngularVelocity(Vector omega) { angularVelocity = omega; }
+    void setMomentOfInertia(Matrix3x3 I) { momentOfInertia = I; }
+    void setPosition(Point pos) { position = pos; }
+    void setTheta(double t) { theta = t; }
+    void setPhi(double p) { phi = p; }
+    void setFrictionCoefficient(double mu) { frictionCoefficient = mu; }
+
+    Point checkForCollision(Domino d, int &ri, int &rj);
+    void handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal);
+    void update(double delta_t, std::vector<Domino> &allDominoes);
+    void render();
+};
+
+
+
+
+#endif
+// FORMS_H_INCLUDED

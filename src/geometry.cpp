@@ -168,3 +168,14 @@ Point operator+(const Point &p, const Vector &v)
 
     return res;
 }
+
+Vector operator/(const Vector &v, const double &k)
+{
+    Vector res = v;
+
+    res.x /= k;
+    res.y /= k;
+    res.z /= k;
+
+    return res;
+}

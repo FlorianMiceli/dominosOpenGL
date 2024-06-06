@@ -258,7 +258,7 @@ int main(int argc, char* args[])
         SDL_Event event;
 
         // Camera position
-        Point camera_position(0, 0.0, 20.0);
+        Point camera_position(0, 0.0, 10.0);
 
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
@@ -268,14 +268,26 @@ int main(int argc, char* args[])
             forms_list[i] = NULL;
         }
 
-
+        // Ground
+        Cube_face *pGround = new Cube_face(Vector(1,0,0), Vector(0,0,1), Point(-5, 0, -5), 10, 10, WHITE);
+        forms_list[number_of_forms] = pGround;
 
         Cuboid *pCuboid = NULL;
         pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 5, 0), 1, 1, 1, BLUE);
-        forms_list[number_of_forms] = pCuboid;
+        // forms_list[++number_of_forms] = pCuboid;
 
         Cuboid pCuboid2(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 0, 0), 1, 1, 1, RED);
-        forms_list[++number_of_forms] = &pCuboid2;
+        // forms_list[++number_of_forms] = &pCuboid2;
+
+        // Domino
+        Domino pDomino(Vector(1,0,0), Vector(0,0,1), Vector(0,1,0), Point(0, 0, 0), 0.2, 0.5, 1, RED, 1, Vector(0,0,0), Vector(0,0,0),
+                        Matrix3x3(), Point(0, 0, 0), 0, 0, 0);
+        //set some initial velocity
+        forms_list[++number_of_forms] = &pDomino;
+
+
+        pDomino.setVelocity(Vector(0,0,-1));
+        pDomino.setAngularVelocity(Vector(0,0,0.1));
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
@@ -285,7 +297,7 @@ int main(int argc, char* args[])
                 number_of_forms++;
             }
         }
-
+        
         
         
 
@@ -334,19 +346,9 @@ int main(int argc, char* args[])
             if (elapsed_time > ANIM_DELAY)
             {
                 previous_time = current_time;
-                update(forms_list, 0.25e-3 * elapsed_time); // International system units : seconds
-                //test for collision between pCuboid and pCuboid2
-                Point intersection;
-                intersection = pCuboid->checkForCollision(pCuboid2);
-                std::cout << "Intersection point : " << intersection << std::endl;
-                if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
-                {
-                    std::cout << "Collision detected at point : " << intersection << std::endl;
-                }
-                else
-                {
-                    std::cout << "No collision detected" << std::endl;
-                }
+                std::cout << "forms_list[0]: " << forms_list[0] << std::endl;
+                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+            
             }
 
             // Render the scene

@@ -2,6 +2,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <GL/GLU.h>
 #include "forms.h"
+#include <vector>
 
 
 void gravity(double delta_t, Animation &anim)
@@ -114,7 +115,7 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
 
 void Cube_face::update(double delta_t)
 {
-    anim.setPhi(anim.getPhi() + 1);
+    anim.setPhi(anim.getPhi() + 0);
     // gravity(delta_t, anim);
     solid(anim);
 }
@@ -139,6 +140,11 @@ void Cube_face::render()
         glVertex3d(p4.x, p4.y, p4.z);
     }
     glEnd();
+}
+
+Vector Cube_face::getNormal()
+{
+    return Vector();
 }
 
 Point Cube_face::getCenter()
@@ -282,7 +288,7 @@ void Cuboid::render()
     glEnd();
 }
 
-Point Cuboid::checkForCollision(Cuboid c)
+Point Cuboid::checkForCollision(Cuboid c, int& ri, int& rj)
 {
     for (int i = 0; i < 12; i++)
     {
@@ -293,6 +299,8 @@ Point Cuboid::checkForCollision(Cuboid c)
             Point intersection = f.checkForCollision(s);
             if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
             {
+                ri = i;
+                rj = j;
                 return intersection;
             }
         }
@@ -359,5 +367,159 @@ Segment Cuboid::getSegment(int i)
     default:
         break;
     }
+}
+
+// double Domino::getSpeedAbs()
+// {
+//     return sqrt(pow(Speed.x, 2) + pow(Speed.y, 2) + pow(Speed.z, 2));
+// }
+
+void Domino::update(double delta_t, std::vector<Domino> &allDominoes)
+{
+    std::cout << "Updating domino" << std::endl;
+
+    // Update the domino's state as usual
+    anim.setPhi(anim.getPhi() + 0);
+    anim.setTheta(anim.getTheta() + 0);
+    gravity(delta_t, anim);
+    solid(anim);
+    // Update Positions and Orientations
+    Point r1 = this->getPosition();
+    Point r2 = this->getPosition();
+    Vector v1 = this->getVelocity();
+    Vector v2 = this->getVelocity();
+    Vector omega1 = this->getAngularVelocity();
+    Vector omega2 = this->getAngularVelocity();
+    double theta1 = this->getTheta();
+    double theta2 = this->getTheta();
+    r1 = r1 + v1;
+    r2 = r2 + v2;
+    theta1 = theta1 + omega1.norm();
+    theta2 = theta2 + omega2.norm();
+
+    // Update dominoes position and angle
+    this->setPosition(r1);
+    this->setTheta(theta1);
+    this->setVelocity(v1);
+    this->setAngularVelocity(omega1);
+
+    // Check for collisions
+    int ri = -1;
+    int rj = -1;
+    for (Domino& otherDomino : allDominoes)
+    {
+        if (&otherDomino == this) continue; // Skip self
+
+        Point collisionPoint = this->checkForCollision(otherDomino, ri, rj);
+        // get the face of the other domino that was hit
+        Cube_face face = otherDomino.getFace(rj);
+        if (collisionPoint.x != 0 || collisionPoint.y != 0 || collisionPoint.z != 0)
+        {
+            // Handle the collision
+            this->handleCollision(otherDomino, collisionPoint, face.getNormal());
+        }
+    }
+}
+
+void Domino::render()
+{
+    //use the cuboid render method
+    Cuboid::render();
+}
+
+Point Domino::checkForCollision(Domino d, int &ri, int &rj)
+{
+    // Check for collision with another domino
+    return Cuboid::checkForCollision(d, ri, rj);
+}
+
+
+void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal)
+{
+    // get information
+    // Domino 1
+    double m1 = this->getMass();
+    Vector v1 = this->getVelocity();
+    Vector omega1 = this->getAngularVelocity();
+    Matrix3x3 I1 = this->getMomentOfInertia();
+    Point r1 = this->getPosition();
+    double theta1 = this->getTheta();
+    double phi1 = this->getPhi();
+    double l1 = this->getLength();
+    double w1 = this->getWidth();
+    double h1 = this->getHeight();
+    double mu1 = this->getFrictionCoefficient();
+
+    // Domino 2
+    double m2 = d.getMass();
+    Vector v2 = d.getVelocity();
+    Vector omega2 = d.getAngularVelocity();
+    Matrix3x3 I2 = d.getMomentOfInertia();
+    Point r2 = d.getPosition();
+    double theta2 = d.getTheta();
+    double phi2 = d.getPhi();
+    double l2 = d.getLength();
+    double w2 = d.getWidth();
+    double h2 = d.getHeight();
+    double mu2 = d.getFrictionCoefficient();
+
+    //collision point
+    Point rc = collisionPoint;
+
+    // Calculate relative velocity at the point of collision
+    Vector rc_minus_r1 = Vector(r1, rc);
+    Vector rc_minus_r2 = Vector(r2, rc);
+    Vector v_rel = (v1 + omega1.cross(rc_minus_r1)) - (v2 + omega2.cross(rc_minus_r2));
+
+    // Assuming the normal vector 'n' is given
+    Vector n = collisionNormal;
+
+    // Calculate the normal component of the relative velocity
+    Vector v_rel_n = n * (v_rel.dot(n));
+
+    // Calculate the tangential component of the relative velocity
+    Vector v_rel_t = v_rel - v_rel_n;
+
+    // Coefficient of restitution
+    double e = 0.95; 
+
+    // Calculate the inverse of the moment of inertia for both dominos
+    Matrix3x3 I1_inv = I1.inverse();
+    Matrix3x3 I2_inv = I2.inverse();
+
+    // Calculate the cross product of (rc - r1) and n, and (rc - r2) and n
+    Vector cross1 = (rc_minus_r1.cross(n));
+    Vector cross2 = (rc_minus_r2.cross(n));
+
+    // Calculate the dot product of n with the result of the cross product and inverse moment of inertia multiplication
+    double dot1 = n.dot(I1_inv * cross1);
+    double dot2 = n.dot(I2_inv * cross2);
+
+    // Calculate the normal impulse Jn
+    double Jn = - (1 + e) * v_rel_n.dot(n) * (1/m1 + 1/m2 + dot1 + dot2);
+
+    // Calculate the combined friction coefficient
+    double mu = (mu1 + mu2) / 2;
+
+    // Calculate the magnitude of the normal impulse
+    double Jn_magnitude = std::abs(Jn);
+
+    // Calculate the magnitude of the tangential component of the relative velocity
+    double v_rel_t_magnitude = v_rel_t.norm();
+
+    // Calculate the tangential impulse Jt
+    Vector Jt = - std::min(mu * Jn_magnitude, v_rel_t_magnitude) * (v_rel_t / v_rel_t_magnitude);
+
+    // Update the linear velocities
+    v1 = v1 + Jn / m1;
+    v2 = v2 - Jn / m2;
+
+    // Update the angular velocities
+    omega1 = omega1 + I1_inv * (rc_minus_r1.cross(Jn));
+    omega2 = omega2 - I2_inv * (rc_minus_r2.cross(Jn)); 
+
+    
+    
+
 }
 
