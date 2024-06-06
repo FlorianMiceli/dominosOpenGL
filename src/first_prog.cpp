@@ -15,8 +15,8 @@
 /* Constants and functions declarations                                    */
 /***************************************************************************/
 // Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1920-300;
+const int SCREEN_HEIGHT = 1080-500;
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 100;
@@ -258,7 +258,7 @@ int main(int argc, char* args[])
         SDL_Event event;
 
         // Camera position
-        Point camera_position(0, 0.0, 5.0);
+        Point camera_position(0, 0.0, 20.0);
 
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
@@ -269,60 +269,13 @@ int main(int argc, char* args[])
         }
 
 
-        Cube_face *pFace = NULL;
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0, 0, 0), 1, 1, RED);
-        forms_list[number_of_forms] = pFace;
 
         Cuboid *pCuboid = NULL;
-        pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0.5, 0.5, 0.5), 1, 1, 1, WHITE);
-        // forms_list[++number_of_forms] = pCuboid;
+        pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 5, 0), 1, 1, 1, BLUE);
+        forms_list[number_of_forms] = pCuboid;
 
-        Segment *pSegment = NULL;
-        pSegment = new Segment(Point(0, 0, 0), Point(1, 1, 1), BLUE);
-        forms_list[++number_of_forms] = pSegment;
-
-
-        //test for Cuboid::getFace, afficher pcuboid
-        Cube_face face = pCuboid->getFace(0);
-        forms_list[++number_of_forms] = &face;
-        Cube_face face1 = pCuboid->getFace(1);
-        forms_list[++number_of_forms] = &face1;
-        Cube_face face2 = pCuboid->getFace(2);
-        forms_list[++number_of_forms] = &face2;
-        Cube_face face3 = pCuboid->getFace(3);
-        forms_list[++number_of_forms] = &face3;
-        Cube_face face4 = pCuboid->getFace(4);
-        forms_list[++number_of_forms] = &face4;
-        Cube_face face5 = pCuboid->getFace(5);
-        forms_list[++number_of_forms] = &face5;
-
-        //test for Cuboid::getSegment, afficher pcuboid
-        Segment segment = pCuboid->getSegment(0);
-        forms_list[++number_of_forms] = &segment;
-        Segment segment1 = pCuboid->getSegment(1);
-        forms_list[++number_of_forms] = &segment1;
-        Segment segment2 = pCuboid->getSegment(2);
-        forms_list[++number_of_forms] = &segment2;
-        Segment segment3 = pCuboid->getSegment(3);
-        forms_list[++number_of_forms] = &segment3;
-        Segment segment4 = pCuboid->getSegment(4);
-        forms_list[++number_of_forms] = &segment4;
-        Segment segment5 = pCuboid->getSegment(5);
-        forms_list[++number_of_forms] = &segment5;
-        Segment segment6 = pCuboid->getSegment(6);
-        forms_list[++number_of_forms] = &segment6;
-        Segment segment7 = pCuboid->getSegment(7);
-        forms_list[++number_of_forms] = &segment7;
-        Segment segment8 = pCuboid->getSegment(8);
-        forms_list[++number_of_forms] = &segment8;
-        Segment segment9 = pCuboid->getSegment(9);
-        forms_list[++number_of_forms] = &segment9;
-        Segment segment10 = pCuboid->getSegment(10);
-        forms_list[++number_of_forms] = &segment10;
-        Segment segment11 = pCuboid->getSegment(11);
-        forms_list[++number_of_forms] = &segment11;
-
-
+        Cuboid pCuboid2(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 0, 0), 1, 1, 1, RED);
+        forms_list[++number_of_forms] = &pCuboid2;
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
@@ -332,6 +285,10 @@ int main(int argc, char* args[])
                 number_of_forms++;
             }
         }
+
+        
+        
+
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
@@ -378,6 +335,18 @@ int main(int argc, char* args[])
             {
                 previous_time = current_time;
                 update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+                //test for collision between pCuboid and pCuboid2
+                Point intersection;
+                intersection = pCuboid->checkForCollision(pCuboid2);
+                std::cout << "Intersection point : " << intersection << std::endl;
+                if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
+                {
+                    std::cout << "Collision detected at point : " << intersection << std::endl;
+                }
+                else
+                {
+                    std::cout << "No collision detected" << std::endl;
+                }
             }
 
             // Render the scene

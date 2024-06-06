@@ -36,7 +36,6 @@ public:
     double norm();
     Vector integral(double delta_t);
     Vector cross(const Vector &v);
-
     void operator+=(const Vector &v);
 };
 
