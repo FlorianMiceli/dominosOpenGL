@@ -39,6 +39,15 @@ void render(Form *formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window **window);
 
+Point camera_position(0.0, 0.0, 0.0);
+
+double cam_yaw = 1.5;
+double cam_pitch = 0.0;
+double cam_dist = 10.0;
+const double step = 0.2;
+const double zoom_step = 0.5;
+const double rotate_step=0.1;
+
 /***************************************************************************/
 /* Functions implementations                                               */
 /***************************************************************************/
@@ -297,10 +306,16 @@ int main(int argc, char *args[])
         // Camera position
         Point camera_position(0, 0.0, 15.0);
 
+        // Set the camera position and parameters
+        double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
+        double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
+        double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
+        gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z, 0.0, 1.0, 0.0);
+
         // Textures creation //////////////////////////////////////////////////////////
         GLuint textureid_1, textureid_2;
-        createTextureFromImage("resources/images/sol.jpg", &textureid_1);
-        createTextureFromImage("resources/images/bois.jpeg", &textureid_2);
+        createTextureFromImage("resources/images/bois.jpeg", &textureid_1);
+        createTextureFromImage("resources/images/sol.jpg", &textureid_2);
         // Textures ready to be enabled (with private member " texture_id" of each form)
 
         // The forms to render
@@ -357,27 +372,30 @@ int main(int argc, char *args[])
                     switch (key_pressed)
                     {
                     // Quit the program when 'q' or Escape keys are pressed
-                    case SDLK_q:
                     case SDLK_ESCAPE:
                         quit = true;
                         break;
-                    case SDLK_UP:
-                        camera_position.y += 0.5;
+                    case SDLK_d:
+                        camera_position.x += step * sin(cam_yaw);
+                        camera_position.z -= step * cos(cam_yaw);
                         break;
-                    case SDLK_DOWN:
-                        camera_position.y -= 0.5;
+                    case SDLK_q:
+                        camera_position.x -= step * sin(cam_yaw);
+                        camera_position.z += step * cos(cam_yaw);
                         break;
-                    case SDLK_LEFT:
-                        camera_position.x -= 0.5;
+                    case SDLK_z:
+                        camera_position.x -= step * cos(cam_yaw);
+                        camera_position.z -= step * sin(cam_yaw);
                         break;
-                    case SDLK_RIGHT:
-                        camera_position.x += 0.5;
+                    case SDLK_s:
+                        camera_position.x += step * cos(cam_yaw);
+                        camera_position.z += step * sin(cam_yaw);
                         break;
-                    case SDLK_p:
-                        camera_position.z -= 0.5;
+                    case SDLK_SPACE:
+                        camera_position.y += step;
                         break;
-                    case SDLK_m:
-                        camera_position.z += 0.5;
+                    case SDLK_LSHIFT:
+                        camera_position.y -= step;
                         break;
 
                     default:
