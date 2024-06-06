@@ -282,93 +282,45 @@ int main(int argc, char* args[])
         forms_list[++number_of_forms] = pSegment;
 
 
-        // //test for Cuboid::getFace, afficher pcuboid
-        // Cube_face face = pCuboid->getFace(0);
-        // forms_list[++number_of_forms] = &face;
-        // Cube_face face1 = pCuboid->getFace(1);
-        // forms_list[++number_of_forms] = &face1;
-        // Cube_face face2 = pCuboid->getFace(2);
-        // forms_list[++number_of_forms] = &face2;
-        // Cube_face face3 = pCuboid->getFace(3);
-        // forms_list[++number_of_forms] = &face3;
-        // Cube_face face4 = pCuboid->getFace(4);
-        // forms_list[++number_of_forms] = &face4;
-        // Cube_face face5 = pCuboid->getFace(5);
-        // forms_list[++number_of_forms] = &face5;
+        //test for Cuboid::getFace, afficher pcuboid
+        Cube_face face = pCuboid->getFace(0);
+        forms_list[++number_of_forms] = &face;
+        Cube_face face1 = pCuboid->getFace(1);
+        forms_list[++number_of_forms] = &face1;
+        Cube_face face2 = pCuboid->getFace(2);
+        forms_list[++number_of_forms] = &face2;
+        Cube_face face3 = pCuboid->getFace(3);
+        forms_list[++number_of_forms] = &face3;
+        Cube_face face4 = pCuboid->getFace(4);
+        forms_list[++number_of_forms] = &face4;
+        Cube_face face5 = pCuboid->getFace(5);
+        forms_list[++number_of_forms] = &face5;
 
         //test for Cuboid::getSegment, afficher pcuboid
         Segment segment = pCuboid->getSegment(0);
         forms_list[++number_of_forms] = &segment;
-        Point p1 = segment.getP1();
-        Point p2 = segment.getP2();
-        std::cout << "p1: " << p1 << std::endl;
-        std::cout << "p2: " << p2 << std::endl;
         Segment segment1 = pCuboid->getSegment(1);
         forms_list[++number_of_forms] = &segment1;
-        Point p3 = segment1.getP1();
-        Point p4 = segment1.getP2();
-        std::cout << "p3: " << p3 << std::endl;
-        std::cout << "p4: " << p4 << std::endl;
         Segment segment2 = pCuboid->getSegment(2);
         forms_list[++number_of_forms] = &segment2;
-        Point p5 = segment2.getP1();
-        Point p6 = segment2.getP2();
-        std::cout << "p5: " << p5 << std::endl;
-        std::cout << "p6: " << p6 << std::endl;
         Segment segment3 = pCuboid->getSegment(3);
         forms_list[++number_of_forms] = &segment3;
-        Point p7 = segment3.getP1();
-        Point p8 = segment3.getP2();
-        std::cout << "p7: " << p7 << std::endl;
-        std::cout << "p8: " << p8 << std::endl;
         Segment segment4 = pCuboid->getSegment(4);
         forms_list[++number_of_forms] = &segment4;
-        Point p9 = segment4.getP1();
-        Point p10 = segment4.getP2();
-        std::cout << "p9: " << p9 << std::endl;
-        std::cout << "p10: " << p10 << std::endl;
         Segment segment5 = pCuboid->getSegment(5);
         forms_list[++number_of_forms] = &segment5;
-        Point p11 = segment5.getP1();
-        Point p12 = segment5.getP2();
-        std::cout << "p11: " << p11 << std::endl;
-        std::cout << "p12: " << p12 << std::endl;
         Segment segment6 = pCuboid->getSegment(6);
         forms_list[++number_of_forms] = &segment6;
-        Point p13 = segment6.getP1();
-        Point p14 = segment6.getP2();
-        std::cout << "p13: " << p13 << std::endl;
-        std::cout << "p14: " << p14 << std::endl;
         Segment segment7 = pCuboid->getSegment(7);
         forms_list[++number_of_forms] = &segment7;
-        Point p15 = segment7.getP1();
-        Point p16 = segment7.getP2();
-        std::cout << "p15: " << p15 << std::endl;
-        std::cout << "p16: " << p16 << std::endl;
         Segment segment8 = pCuboid->getSegment(8);
         forms_list[++number_of_forms] = &segment8;
-        Point p17 = segment8.getP1();
-        Point p18 = segment8.getP2();
-        std::cout << "p17: " << p17 << std::endl;
-        std::cout << "p18: " << p18 << std::endl;
         Segment segment9 = pCuboid->getSegment(9);
         forms_list[++number_of_forms] = &segment9;
-        Point p19 = segment9.getP1();
-        Point p20 = segment9.getP2();
-        std::cout << "p19: " << p19 << std::endl;
-        std::cout << "p20: " << p20 << std::endl;
         Segment segment10 = pCuboid->getSegment(10);
         forms_list[++number_of_forms] = &segment10;
-        Point p21 = segment10.getP1();
-        Point p22 = segment10.getP2();
-        std::cout << "p21: " << p21 << std::endl;
-        std::cout << "p22: " << p22 << std::endl;
         Segment segment11 = pCuboid->getSegment(11);
         forms_list[++number_of_forms] = &segment11;
-        Point p23 = segment11.getP1();
-        Point p24 = segment11.getP2();
-        std::cout << "p23: " << p23 << std::endl;
-        std::cout << "p24: " << p24 << std::endl;
 
 
 
