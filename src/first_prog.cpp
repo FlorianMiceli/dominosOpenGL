@@ -15,7 +15,7 @@
 /* Constants and functions declarations                                    */
 /***************************************************************************/
 // Screen dimension constants
-const int SCREEN_WIDTH = 1920-300;
+const int SCREEN_WIDTH = 1920-1000;
 const int SCREEN_HEIGHT = 1080-500;
 
 // Max number of forms : static allocation
@@ -334,7 +334,7 @@ int main(int argc, char* args[])
             if (elapsed_time > ANIM_DELAY)
             {
                 previous_time = current_time;
-                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+                update(forms_list, 0.25e-3 * elapsed_time); // International system units : seconds
                 //test for collision between pCuboid and pCuboid2
                 Point intersection;
                 intersection = pCuboid->checkForCollision(pCuboid2);
