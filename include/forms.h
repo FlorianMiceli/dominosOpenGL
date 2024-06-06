@@ -76,11 +76,11 @@ class Cuboid : public Form
 {
 private:
     Vector vdir1, vdir2, vdir3;
-    double length, width, height;
+    double length, width, height,m;
     Point origin;
 public:
     Cuboid(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
-           Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+           Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0, double m = 1.0,
            Color cl = Color());
     Vector getVdir1() const {return vdir1;}
     Vector getVdir2() const {return vdir2;}
@@ -89,7 +89,9 @@ public:
     double getLength() const {return length;}
     double getWidth() const {return width;}
     double getHeight() const {return height;}
+    double getMass() const {return m;}
     Point getPos() const {return origin;}
+    Point getGcenter() const {return Point(origin.x + 0.5*length, origin.y + 0.5*width, origin.z + 0.5*height);}
     void update(double delta_t);
     void render();
     Point collision(Cuboid &c);

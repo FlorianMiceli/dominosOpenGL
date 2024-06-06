@@ -14,8 +14,8 @@
 /* Constants and functions declarations                                    */
 /***************************************************************************/
 // Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1200;
+const int SCREEN_HEIGHT = 700;
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 10;
@@ -270,11 +270,8 @@ int main(int argc, char *args[])
         pSphere = new Sphere(0.2, Point(0, 5, 0), RED);
         forms_list[number_of_forms] = pSphere;
         number_of_forms++;
-        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 0, 0), 1, 3, 2, BLUE);
+        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 3, 0), -0.5, 3, 2, 1, BLUE);
         forms_list[number_of_forms] = pCuboid;
-        number_of_forms++;
-        pCuboid2 = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 6, 0), 1, 3, 2, GREEN);
-        forms_list[number_of_forms] = pCuboid2;
         number_of_forms++;
 
         // Get first "current time"
