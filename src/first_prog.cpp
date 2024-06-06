@@ -17,8 +17,6 @@
 // Screen dimension constants
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 700;
-const int SCREEN_WIDTH = 1200;
-const int SCREEN_HEIGHT = 700;
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 10;
@@ -301,7 +299,7 @@ int main(int argc, char *args[])
 
         // Textures creation //////////////////////////////////////////////////////////
         GLuint textureid_1, textureid_2;
-        createTextureFromImage("resources/images/domino.jpg", &textureid_1);
+        createTextureFromImage("resources/images/sol.jpg", &textureid_1);
         createTextureFromImage("resources/images/bois.jpeg", &textureid_2);
         // Textures ready to be enabled (with private member " texture_id" of each form)
 
@@ -323,18 +321,14 @@ int main(int argc, char *args[])
         Cuboid *pCuboid = NULL;
         Cuboid *pCuboid2 = NULL;
         Cube_face *pFace = NULL;
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE); // For the cube
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0.5, 0, 0.5), 1, 1, WHITE); // For the animation
-        pFace->setTexture(textureid_1);
-        forms_list[number_of_forms] = pFace;
-        number_of_forms++;
-        pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, WHITE);
-        forms_list[number_of_forms] = pFace;
+        pCuboid2 = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(-50, 0, -50), 100, 0, 100, 1, WHITE);
+        pCuboid2->setTexture(textureid_1);
+        forms_list[number_of_forms] = pCuboid2;
         number_of_forms++;
         pSphere = new Sphere(0.2, Point(0, 5, 0), RED);
         forms_list[number_of_forms] = pSphere;
         number_of_forms++;
-        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 0, 0), -0.5, 3, 2, 1, BLUE);
+        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 0, 0), -0.5, 3, 2, 1, WHITE);
         pCuboid->setTexture(textureid_2);
         forms_list[number_of_forms] = pCuboid;
         number_of_forms++;
