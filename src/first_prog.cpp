@@ -40,6 +40,14 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
+Point camera_position(0.0, 0.0, 0.0);
+
+double cam_yaw = 0.0;
+double cam_pitch = 0.0;
+double cam_dist = 10.0;
+const double step = 0.2;
+const double zoom_step = 0.5;
+const double rotate_step=0.1;
 
 /***************************************************************************/
 /* Functions implementations                                               */
@@ -176,7 +184,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form* formlist[MAX_FORMS_NUMBER])
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -185,8 +193,14 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
 
+    Point cam_direction(0.0, 1.0, 0.0);
+
     // Set the camera position and parameters
-    gluLookAt(cam_pos.x,cam_pos.y,cam_pos.z, 0.0,0.0,0.0, 0.0,1.0,0.0);
+    double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
+    double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
+    double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
+    gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z,0.0,1.0,0.0);
+    
     // Isometric view
     glRotated(-45, 0, 1, 0);
     glRotated(30, 1, 0, -1);
@@ -256,9 +270,6 @@ int main(int argc, char* args[])
 
         // Event handler
         SDL_Event event;
-
-        // Camera position
-        Point camera_position(0, 0.0, 5.0);
 
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
@@ -357,9 +368,30 @@ int main(int argc, char* args[])
                     switch(key_pressed)
                     {
                     // Quit the program when 'q' or Escape keys are pressed
-                    case SDLK_q:
                     case SDLK_ESCAPE:
                         quit = true;
+                        break;
+                    case SDLK_d:
+                        camera_position.x += step * sin(cam_yaw);
+                        camera_position.z -= step * cos(cam_yaw);
+                        break;
+                    case SDLK_q: 
+                        camera_position.x -= step * sin(cam_yaw);
+                        camera_position.z += step * cos(cam_yaw);
+                        break;
+                    case SDLK_z: 
+                        camera_position.x -= step * cos(cam_yaw);
+                        camera_position.z -= step * sin(cam_yaw);
+                        break;
+                    case SDLK_s:
+                        camera_position.x += step * cos(cam_yaw);
+                        camera_position.z += step * sin(cam_yaw);
+                        break;
+                    case SDLK_SPACE: 
+                        camera_position.y += step;
+                        break;
+                    case SDLK_LSHIFT: 
+                        camera_position.y -= step;
                         break;
 
                     default:
@@ -381,7 +413,7 @@ int main(int argc, char* args[])
             }
 
             // Render the scene
-            render(forms_list, camera_position);
+            render(forms_list);
 
             // Update window screen
             SDL_GL_SwapWindow(gWindow);
