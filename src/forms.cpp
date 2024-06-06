@@ -3,6 +3,7 @@
 #include <GL/GLU.h>
 #include "forms.h"
 #include <vector>
+#include <algorithm>
 
 
 void gravity(double delta_t, Animation &anim)
@@ -52,13 +53,6 @@ Segment::Segment(Point pt1, Point pt2, Color cl)
     col = cl;
 }
 
-// Segment::Segment(Point pt1, Vector v, Color cl)
-// {
-//     p1 = pt1;
-//     direction = v;
-//     p2 = Point(p1.x + v.x, p1.y + v.y, p1.z + v.z);
-//     col = cl;
-// }
 
 void Segment::render()
 {
@@ -229,7 +223,7 @@ void Cuboid::update(double delta_t)
 
 void Cuboid::render()
 {
-    Point p1 = Point();
+    Point p1 = this->getPosition();
     Point p2 = p1, p3, p4 = p1;
     Point p5 = p1, p6 = p1, p7 = p1, p8 = p1;
     p2.translate(length*vdir1);
@@ -374,38 +368,62 @@ Segment Cuboid::getSegment(int i)
 //     return sqrt(pow(Speed.x, 2) + pow(Speed.y, 2) + pow(Speed.z, 2));
 // }
 
-void Domino::update(double delta_t, std::vector<Domino> &allDominoes)
+void Domino::update(double delta_t)
 {
-    std::cout << "Updating domino" << std::endl;
-
-    // Update the domino's state as usual
-    anim.setPhi(anim.getPhi() + 0);
-    anim.setTheta(anim.getTheta() + 0);
-    gravity(delta_t, anim);
-    solid(anim);
     // Update Positions and Orientations
-    Point r1 = this->getPosition();
-    Point r2 = this->getPosition();
-    Vector v1 = this->getVelocity();
-    Vector v2 = this->getVelocity();
-    Vector omega1 = this->getAngularVelocity();
-    Vector omega2 = this->getAngularVelocity();
-    double theta1 = this->getTheta();
-    double theta2 = this->getTheta();
-    r1 = r1 + v1;
-    r2 = r2 + v2;
-    theta1 = theta1 + omega1.norm();
-    theta2 = theta2 + omega2.norm();
 
-    // Update dominoes position and angle
-    this->setPosition(r1);
-    this->setTheta(theta1);
+
+    // Get the current state of the domino
+    Point r = this->getPosition();
+    Vector v = this->getVelocity();
+    Vector omega = this->getAngularVelocity();
+    double theta = this->getTheta();
+    double phi = this->getPhi();
+    double l = this->getLength();
+    double w = this->getWidth();
+    double h = this->getHeight();
+    double mu = this->getFrictionCoefficient();
+
+    // Update velocity
+    // Vector v1 = Vector(v.x + delta_t * anim.getAccel().x, v.y + delta_t * anim.getAccel().y, v.z + delta_t * anim.getAccel().z);
+    //arbirtary velocity for now
+    Vector v1 = Vector(1, 0, 0);
     this->setVelocity(v1);
+
+
+    // Update angular velocity
+    Vector omega1 = Vector(omega.x, omega.y, omega.z);
     this->setAngularVelocity(omega1);
 
+    // Update theta
+    double theta1 = theta + delta_t * omega1.x;
+    this->setTheta(theta1);
+
+    // Update phi
+    double phi1 = phi + delta_t * omega1.y;
+    this->setPhi(phi1);
+
+    // Update the acceleration
+    Vector a1 = Vector(-0.5 * anim.getSpeed().x, -9.81, -0.5 * anim.getSpeed().z);
+    anim.setAccel(a1);
+
+    // Update the position based on speed and angular velocity
+    Point r1 = Point(r.x + delta_t * v1.x + 0.5 * delta_t * delta_t * anim.getAccel().x,
+                     r.y + delta_t * v1.y + 0.5 * delta_t * delta_t * anim.getAccel().y,
+                     r.z + delta_t * v1.z + 0.5 * delta_t * delta_t * anim.getAccel().z);
+
+    std::cout << "Position: " << r1.x << " " << r1.y << " " << r1.z << std::endl;
+
+    this->setPosition(r1);
+    
+    
     // Check for collisions
     int ri = -1;
     int rj = -1;
+
+    // Get all dominoes (empty for now)
+    std::vector<Domino> allDominoes;
+
     for (Domino& otherDomino : allDominoes)
     {
         if (&otherDomino == this) continue; // Skip self
@@ -423,9 +441,12 @@ void Domino::update(double delta_t, std::vector<Domino> &allDominoes)
 
 void Domino::render()
 {
+    std::cout << "Rendering domino" << std::endl;
     //use the cuboid render method
     Cuboid::render();
 }
+
+
 
 Point Domino::checkForCollision(Domino d, int &ri, int &rj)
 {

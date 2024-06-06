@@ -300,8 +300,7 @@ int main(int argc, char* args[])
         forms_list[++number_of_forms] = &pDomino;
 
 
-        pDomino.setVelocity(Vector(0,0,-1));
-        pDomino.setAngularVelocity(Vector(0,0,0.1));
+
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
@@ -381,8 +380,7 @@ int main(int argc, char* args[])
             if (elapsed_time > ANIM_DELAY)
             {
                 previous_time = current_time;
-                std::cout << "forms_list[0]: " << forms_list[0] << std::endl;
-                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+                update(forms_list, 0.1e-3 * elapsed_time); // International system units : seconds
             
             }
 

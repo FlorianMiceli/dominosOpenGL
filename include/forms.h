@@ -171,23 +171,35 @@ class Cuboid : public Form
 private:
     Vector vdir1, vdir2, vdir3;
     double length, width, height;
-    Point org;
+    Point position;
 public:
     Cuboid(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
-          Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+          Point position = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
           Color cl = Color());
     void update(double delta_t);
     void render();
     Point checkForCollision(Cuboid c, int &ri, int &rj);
+
     Vector getVdir1() const {return vdir1;}
     Vector getVdir2() const {return vdir2;}
     Vector getVdir3() const {return vdir3;}
-    Point getOrigin() const {return org;}
+    Point getPosition() const {return position;}
     double getLength() const {return length;}
     double getWidth() const {return width;}
     double getHeight() const {return height;}
-    Cube_face getFace(int i);
+    Cube_face getFace(int i); 
     Segment getSegment(int i);
+
+    void setVdir1(Vector v) {vdir1 = v;}
+    void setVdir2(Vector v) {vdir2 = v;}
+    void setVdir3(Vector v) {vdir3 = v;}
+    void setPosition(Point p) {position = p;}
+    void setLength(double l) {length = l;}
+    void setWidth(double w) {width = w;}
+    void setHeight(double h) {height = h;}
+    // void setFace(int i, Cube_face f);
+    // void setSegment(int i, Segment s);  
+
 };
 
 class Domino : public Cuboid
@@ -197,25 +209,23 @@ private:
     Vector velocity;
     Vector angularVelocity;
     Matrix3x3 momentOfInertia;
-    Point position;
     double theta;
     double phi;
     double frictionCoefficient;
 
 public:
     Domino(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
-           Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+           Point position = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
            Color cl = Color(), double m = 1.0, Vector v = Vector(), Vector omega = Vector(),
            Matrix3x3 I = Matrix3x3(), Point pos = Point(), double t = 0.0, double p = 0.0,
            double mu = 0.0)
-        : Cuboid(v1, v2, v3, org, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
-          momentOfInertia(I), position(pos), theta(t), phi(p), frictionCoefficient(mu) {}
+        : Cuboid(v1, v2, v3, position, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
+          momentOfInertia(I), theta(t), phi(p), frictionCoefficient(mu) {}
 
     double getMass() const { return mass; }
     Vector getVelocity() const { return velocity; }
     Vector getAngularVelocity() const { return angularVelocity; }
     Matrix3x3 getMomentOfInertia() const { return momentOfInertia; }
-    Point getPosition() const { return position; }
     double getTheta() const { return theta; }
     double getPhi() const { return phi; }
     double getFrictionCoefficient() const { return frictionCoefficient; }
@@ -224,7 +234,6 @@ public:
     void setVelocity(Vector v) { velocity = v; }
     void setAngularVelocity(Vector omega) { angularVelocity = omega; }
     void setMomentOfInertia(Matrix3x3 I) { momentOfInertia = I; }
-    void setPosition(Point pos) { position = pos; }
     void setTheta(double t) { theta = t; }
     void setPhi(double p) { phi = p; }
     void setFrictionCoefficient(double mu) { frictionCoefficient = mu; }
@@ -232,6 +241,7 @@ public:
     Point checkForCollision(Domino d, int &ri, int &rj);
     void handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal);
     void update(double delta_t, std::vector<Domino> &allDominoes);
+    void update(double delta_t);
     void render();
 };
 
