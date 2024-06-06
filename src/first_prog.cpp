@@ -297,6 +297,8 @@ int main(int argc, char* args[])
         Domino pDomino(Vector(1,0,0), Vector(0,0,1), Vector(0,1,0), Point(0, 0, 0), 0.2, 0.5, 1, RED, 1, Vector(0,0,0), Vector(0,0,0),
                         Matrix3x3(), Point(0, 0, 0), 0, 0, 0);
         //set some initial velocity
+        pDomino.setVelocity(Vector(0,0,-1));
+        pDomino.setAngularVelocity(Vector(1,0,0));
         forms_list[++number_of_forms] = &pDomino;
 
 

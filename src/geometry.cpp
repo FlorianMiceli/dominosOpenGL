@@ -179,3 +179,14 @@ Vector operator/(const Vector &v, const double &k)
 
     return res;
 }
+
+Point operator-(const Point &p, const Vector &v)
+{
+    Point res = p;
+
+    res.x -= v.x;
+    res.y -= v.y;
+    res.z -= v.z;
+
+    return res;
+}

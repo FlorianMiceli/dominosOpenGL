@@ -59,4 +59,6 @@ Point operator+(const Point &p, const Vector &v);
 
 Vector operator/(const Vector &v, const double &k);
 
+Point operator-(const Point &p, const Vector &v);
+
 #endif // GEOMETRY_H_INCLUDED

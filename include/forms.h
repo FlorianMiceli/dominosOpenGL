@@ -179,6 +179,8 @@ public:
     void update(double delta_t);
     void render();
     Point checkForCollision(Cuboid c, int &ri, int &rj);
+    void handleCollision(Cuboid &c, const Point &collisionPoint, const Vector &collisionNormal);
+    Point checkForCollision(Cube_face f, int &ri);
 
     Vector getVdir1() const {return vdir1;}
     Vector getVdir2() const {return vdir2;}
@@ -189,6 +191,7 @@ public:
     double getHeight() const {return height;}
     Cube_face getFace(int i); 
     Segment getSegment(int i);
+    Color getColor() const { return col; }
 
     void setVdir1(Vector v) {vdir1 = v;}
     void setVdir2(Vector v) {vdir2 = v;}
@@ -212,7 +215,7 @@ private:
     double theta;
     double phi;
     double frictionCoefficient;
-
+    Vector acceleration;
 public:
     Domino(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
            Point position = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
@@ -220,7 +223,7 @@ public:
            Matrix3x3 I = Matrix3x3(), Point pos = Point(), double t = 0.0, double p = 0.0,
            double mu = 0.0)
         : Cuboid(v1, v2, v3, position, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
-          momentOfInertia(I), theta(t), phi(p), frictionCoefficient(mu) {}
+          momentOfInertia(I), theta(t), phi(p), frictionCoefficient(mu), acceleration(Vector()) {}
 
     double getMass() const { return mass; }
     Vector getVelocity() const { return velocity; }
@@ -229,6 +232,7 @@ public:
     double getTheta() const { return theta; }
     double getPhi() const { return phi; }
     double getFrictionCoefficient() const { return frictionCoefficient; }
+    Vector getAcceleration() const { return acceleration; }
 
     void setMass(double m) { mass = m; }
     void setVelocity(Vector v) { velocity = v; }
@@ -237,11 +241,14 @@ public:
     void setTheta(double t) { theta = t; }
     void setPhi(double p) { phi = p; }
     void setFrictionCoefficient(double mu) { frictionCoefficient = mu; }
+    void setAcceleration(Vector a) { acceleration = a; }
 
     Point checkForCollision(Domino d, int &ri, int &rj);
     void handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal);
-    void update(double delta_t, std::vector<Domino> &allDominoes);
+    // void update(double delta_t, std::vector<Domino> &allDominoes);
     void update(double delta_t);
+    Point updatePosition(const Point &r, const Vector &v1, double delta_t, const Vector &animAccel);
+    void checkCollisions();
     void render();
 };
 
