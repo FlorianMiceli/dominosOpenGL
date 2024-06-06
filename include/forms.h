@@ -47,10 +47,13 @@ private:
     // The sphere center is aligned with the coordinate system origin
     // => no center required here, information is stored in the anim object
     double radius;
+    // Texture
+    GLuint texture_id;
 public:
     Sphere(double r = 1.0,Point org = Point(), Color cl = Color());
     double getRadius() const {return radius;}
     void setRadius(double r) {radius = r;}
+    void setTexture(GLuint textureid) {texture_id = textureid;}
     void update(double delta_t);
     void render();
 };
@@ -62,12 +65,14 @@ class Cube_face : public Form
 private:
     Vector vdir1, vdir2;
     double length, width;
+    GLuint texture_id;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
           Color cl = Color());
     void update(double delta_t);
     void render();
+    void setTexture(GLuint textureid) {texture_id = textureid;}
     Point collision(Cube_face& cf);
     Point collision(Vector &v);
 };
@@ -78,6 +83,7 @@ private:
     Vector vdir1, vdir2, vdir3;
     double length, width, height,m;
     Point origin;
+    GLuint texture_id;
 public:
     Cuboid(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
            Point org = Point(), double l = 1.0, double w = 1.0, double h = 1.0, double m = 1.0,
@@ -86,6 +92,7 @@ public:
     Vector getVdir2() const {return vdir2;}
     Vector getVdir3() const {return vdir3;}
     Point getOrigin() const {return origin;}
+    void setTexture(GLuint textureid) {texture_id = textureid;}
     double getLength() const {return length;}
     double getWidth() const {return width;}
     double getHeight() const {return height;}

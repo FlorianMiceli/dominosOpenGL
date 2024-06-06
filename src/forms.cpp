@@ -42,8 +42,17 @@ void Sphere::render()
 
     Form::render();
 
+    // Mise en route de la texture associee
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    gluQuadricTexture(quad,texture_id);
+    gluQuadricNormals(quad,GLU_SMOOTH);
+
     gluSphere(quad, radius, 20, 20);
     gluDeleteQuadric(quad);
+
+    // Desactivation de la texture
+    glDisable(GL_TEXTURE_2D);
 }
 
 Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
@@ -70,16 +79,27 @@ void Cube_face::render()
     p3.translate(width * vdir2);
     p4.translate(width * vdir2);
 
+    // Autorisation de la texture choisie a la creation de la face (cf main())
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
     Form::render();
 
     glBegin(GL_QUADS);
     {
+        glTexCoord3f(p1.x, p1.y, p1.z);
         glVertex3d(p1.x, p1.y, p1.z);
+        glTexCoord3f(p2.x, p2.y, p2.z);
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord3f(p3.x, p3.y, p3.z);
         glVertex3d(p3.x, p3.y, p3.z);
+        glTexCoord3f(p4.x, p4.y, p4.z);
         glVertex3d(p4.x, p4.y, p4.z);
     }
     glEnd();
+
+    // Ne plus appliquer la texture pour la suite
+    glDisable(GL_TEXTURE_2D);
 }
 
 Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h,double mass, Color cl)
@@ -98,14 +118,14 @@ Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, d
 
 void Cuboid::update(double delta_t)
 {
-    if (anim.getPos().y <= 0.5)
-    {
-        // Collision response
-        // std::cout << anim.getTheta() << std::endl;
-        CollisionResponse2(anim, *this, anim.getPos(), delta_t);
-    }
-    gravity(delta_t, anim);
-    solid(anim);
+    // if (anim.getPos().y <= 0.5)
+    // {
+    //     // Collision response
+    //     // std::cout << anim.getTheta() << std::endl;
+    //     CollisionResponse2(anim, *this, anim.getPos(), delta_t);
+    // }
+    // gravity(delta_t, anim);
+    // solid(anim);
 }
 
 void Cuboid::render()
@@ -134,9 +154,13 @@ void Cuboid::render()
     glBegin(GL_QUADS);
     {
         // Right face
+        glTexCoord3f(p1.x, p1.y, p1.z);
         glVertex3d(p1.x, p1.y, p1.z);
+        glTexCoord3f(p2.x, p2.y, p2.z);
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord3f(p3.x, p3.y, p3.z);
         glVertex3d(p3.x, p3.y, p3.z);
+        glTexCoord3f(p4.x, p4.y, p4.z);
         glVertex3d(p4.x, p4.y, p4.z);
 
         // Top face

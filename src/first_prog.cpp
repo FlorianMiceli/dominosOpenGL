@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <GL/GLU.h>
+#include <SDL2/SDL_image.h>
 
 // Module for space geometry
 #include "geometry.h"
@@ -223,6 +224,51 @@ void close(SDL_Window **window)
     SDL_Quit();
 }
 
+int createTextureFromImage(const char *filename, GLuint *textureID)
+{
+    SDL_Surface *imgSurface = IMG_Load(filename);
+    if (imgSurface == NULL)
+    {
+        std::cerr << "Failed to load texture image: " << filename << std::endl;
+        return -1;
+    }
+    else
+    {
+        // Work out what format to tell glTexImage2D to use...
+        int mode;
+        if (imgSurface->format->BytesPerPixel == 3) // RGB 24bit
+        {
+            mode = GL_RGB;
+        }
+        else if (imgSurface->format->BytesPerPixel == 4) // RGBA 32bit
+        {
+            mode = GL_RGBA;
+        }
+        else
+        {
+            SDL_FreeSurface(imgSurface);
+            std::cerr << "Unable to detect the image color format of: " << filename << std::endl;
+            return -2;
+        }
+        // create one texture name
+        glGenTextures(1, textureID);
+
+        // tell opengl to use the generated texture name
+        glBindTexture(GL_TEXTURE_2D, *textureID);
+
+        // this reads from the sdl imgSurface and puts it into an openGL texture
+        glTexImage2D(GL_TEXTURE_2D, 0, mode, imgSurface->w, imgSurface->h, 0, mode, GL_UNSIGNED_BYTE, imgSurface->pixels);
+
+        // these affect how this texture is drawn later on...
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // clean up
+        SDL_FreeSurface(imgSurface);
+        return 0;
+    }
+}
+
 /***************************************************************************/
 /* MAIN Function                                                           */
 /***************************************************************************/
@@ -251,6 +297,12 @@ int main(int argc, char *args[])
         // Camera position
         Point camera_position(0, 0.0, 15.0);
 
+        // Textures creation //////////////////////////////////////////////////////////
+        GLuint textureid_1, textureid_2;
+        createTextureFromImage("resources/images/domino.jpg", &textureid_1);
+        createTextureFromImage("resources/images/bois.jpeg", &textureid_2);
+        // Textures ready to be enabled (with private member " texture_id" of each form)
+
         // The forms to render
         Form *forms_list[MAX_FORMS_NUMBER];
         unsigned short number_of_forms = 0, i;
@@ -258,19 +310,30 @@ int main(int argc, char *args[])
         {
             forms_list[i] = NULL;
         }
+        // Creates a texture into graphic memory from an image file and assign it a
+        // unique ID, inside textureID
+        // returns 0 if all went fine, a negative value otherwise
+        int createTextureFromImage(const char *filename, GLuint *textureID);
+
         // Create here specific forms and add them to the list...
         // Don't forget to update the actual number_of_forms !
-        Cube_face *pFace = NULL;
         Sphere *pSphere = NULL;
         Cuboid *pCuboid = NULL;
         Cuboid *pCuboid2 = NULL;
+        Cube_face *pFace = NULL;
+        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE); // For the cube
+        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(0.5, 0, 0.5), 1, 1, WHITE); // For the animation
+        pFace->setTexture(textureid_1);
+        forms_list[number_of_forms] = pFace;
+        number_of_forms++;
         pFace = new Cube_face(Vector(1, 0, 0), Vector(0, 1, 0), Point(-0.5, -0.5, -0.5), 1, 1, WHITE);
         forms_list[number_of_forms] = pFace;
         number_of_forms++;
         pSphere = new Sphere(0.2, Point(0, 5, 0), RED);
         forms_list[number_of_forms] = pSphere;
         number_of_forms++;
-        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 3, 0), -0.5, 3, 2, 1, BLUE);
+        pCuboid = new Cuboid(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Point(0, 0, 0), -0.5, 3, 2, 1, BLUE);
+        pCuboid->setTexture(textureid_2);
         forms_list[number_of_forms] = pCuboid;
         number_of_forms++;
 
