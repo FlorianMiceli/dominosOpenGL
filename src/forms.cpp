@@ -17,6 +17,8 @@ void Form::render()
     Point org = anim.getPos();
     glPushMatrix();
     glRotated(anim.getTheta(), 0.0, 0.0, -1.0);
+    glPushMatrix();
+    glRotated(anim.getTheta(), 0.0, 0.0, -1.0);
     glTranslated(org.x, org.y, org.z);
     glColor3f(col.r, col.g, col.b);
 }
@@ -103,6 +105,7 @@ void Cube_face::render()
 }
 
 Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h,double mass, Color cl)
+Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h,double mass, Color cl)
 {
     vdir1 = 1.0 / v1.norm() * v1;
     vdir2 = 1.0 / v2.norm() * v2;
@@ -112,6 +115,8 @@ Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, d
     width = w;
     height = h;
     col = cl;
+    m = mass;
+    anim.setmass(m);
     m = mass;
     anim.setmass(m);
 }
@@ -144,6 +149,10 @@ void Cuboid::render()
     p7.translate(width * vdir2);
     p8 = p5;
     p8.translate(width * vdir2);
+    if(anim.getTheta() <= 5.0)
+    {
+        anim.setTheta(10.0);
+    }
     if(anim.getTheta() <= 5.0)
     {
         anim.setTheta(10.0);

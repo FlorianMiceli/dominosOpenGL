@@ -17,6 +17,8 @@
 // Screen dimension constants
 const int SCREEN_WIDTH = 1200;
 const int SCREEN_HEIGHT = 700;
+const int SCREEN_WIDTH = 1200;
+const int SCREEN_HEIGHT = 700;
 
 // Max number of forms : static allocation
 const int MAX_FORMS_NUMBER = 10;
