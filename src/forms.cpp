@@ -105,7 +105,6 @@ void Cube_face::render()
 }
 
 Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h,double mass, Color cl)
-Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, double h,double mass, Color cl)
 {
     vdir1 = 1.0 / v1.norm() * v1;
     vdir2 = 1.0 / v2.norm() * v2;
@@ -115,8 +114,6 @@ Cuboid::Cuboid(Vector v1, Vector v2, Vector v3, Point org, double l, double w, d
     width = w;
     height = h;
     col = cl;
-    m = mass;
-    anim.setmass(m);
     m = mass;
     anim.setmass(m);
 }
@@ -149,14 +146,11 @@ void Cuboid::render()
     p7.translate(width * vdir2);
     p8 = p5;
     p8.translate(width * vdir2);
-    if(anim.getTheta() <= 5.0)
-    {
-        anim.setTheta(10.0);
-    }
-    if(anim.getTheta() <= 5.0)
-    {
-        anim.setTheta(10.0);
-    }
+
+    // Autorisation de la texture choisie a la creation de la face (cf main())
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
 
     Form::render();
 
@@ -173,33 +167,53 @@ void Cuboid::render()
         glVertex3d(p4.x, p4.y, p4.z);
 
         // Top face
+        glTexCoord3f(p4.x, p4.y, p4.z);
         glVertex3d(p4.x, p4.y, p4.z);
+        glTexCoord3f(p3.x, p3.y, p3.z);
         glVertex3d(p3.x, p3.y, p3.z);
+        glTexCoord3f(p7.x, p7.y, p7.z);
         glVertex3d(p7.x, p7.y, p7.z);
+        glTexCoord3f(p8.x, p8.y, p8.z);
         glVertex3d(p8.x, p8.y, p8.z);
 
         // Left face
+        glTexCoord3f(p8.x, p8.y, p8.z);
         glVertex3d(p8.x, p8.y, p8.z);
+        glTexCoord3f(p7.x, p7.y, p7.z);
         glVertex3d(p7.x, p7.y, p7.z);
+        glTexCoord3f(p6.x, p6.y, p6.z);
         glVertex3d(p6.x, p6.y, p6.z);
+        glTexCoord3f(p5.x, p5.y, p5.z);
         glVertex3d(p5.x, p5.y, p5.z);
 
         // Bottom face
+        glTexCoord3f(p5.x, p5.y, p5.z);
         glVertex3d(p5.x, p5.y, p5.z);
+        glTexCoord3f(p6.x, p6.y, p6.z);
         glVertex3d(p6.x, p6.y, p6.z);
+        glTexCoord3f(p2.x, p2.y, p2.z);
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord3f(p1.x, p1.y, p1.z);
         glVertex3d(p1.x, p1.y, p1.z);
 
         // Front face
+        glTexCoord3f(p1.x, p1.y, p1.z);
         glVertex3d(p1.x, p1.y, p1.z);
+        glTexCoord3f(p4.x, p4.y, p4.z);
         glVertex3d(p4.x, p4.y, p4.z);
+        glTexCoord3f(p8.x, p8.y, p8.z);
         glVertex3d(p8.x, p8.y, p8.z);
+        glTexCoord3f(p5.x, p5.y, p5.z);
         glVertex3d(p5.x, p5.y, p5.z);
 
         // Back face
+        glTexCoord3f(p2.x, p2.y, p2.z);
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord3f(p6.x, p6.y, p6.z);
         glVertex3d(p6.x, p6.y, p6.z);
+        glTexCoord3f(p7.x, p7.y, p7.z);
         glVertex3d(p7.x, p7.y, p7.z);
+        glTexCoord3f(p3.x, p3.y, p3.z);
         glVertex3d(p3.x, p3.y, p3.z);
     }
 
