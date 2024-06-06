@@ -42,7 +42,7 @@ void close(SDL_Window** window);
 
 Point camera_position(0.0, 0.0, 0.0);
 
-double cam_yaw = 0.0;
+double cam_yaw = 1.5;
 double cam_pitch = 0.0;
 double cam_dist = 10.0;
 const double step = 0.2;
@@ -200,7 +200,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER])
     double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
     double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
     gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z,0.0,1.0,0.0);
-    
+
     // Isometric view
     glRotated(-45, 0, 1, 0);
     glRotated(30, 1, 0, -1);
