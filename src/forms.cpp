@@ -420,7 +420,7 @@ void Domino::update(double delta_t)
     }
 
     //if theta is lower than -90 , no update, only theta back to 90
-    if (getTheta() < -90)
+    if (getTheta() < -80)
     {
         // reverse the velocity
         Vector v = getVelocity();
@@ -433,7 +433,7 @@ void Domino::update(double delta_t)
         setAngularVelocity(omega1);
 
         // set theta to 90
-        setTheta(-90);
+        setTheta(-80);
     }
 
     solid(anim);
@@ -582,9 +582,11 @@ void Domino::render()
 
 void Domino::startFalling() {
 
+
     // Set the initial velocity, angular velocity and acceleration
-    this->setAngularVelocity(Vector(0, 0, -50));
-    this->setAngularAcceleration(Vector(0, 0, -9.81));
+    this->setAngularVelocity(Vector(-50, 0, 0));
+
+    // this->setAngularAcceleration(Vector(0, 0, -9.81));
 
 }
 

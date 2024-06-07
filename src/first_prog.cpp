@@ -261,6 +261,7 @@ int main(int argc, char* args[])
         // Main loop flag
         bool quit = false;
         Uint32 current_time, previous_time, elapsed_time;
+        Uint32 previous_time2, elapsed_time2;
 
         // Event handler
         SDL_Event event;
@@ -297,30 +298,23 @@ int main(int argc, char* args[])
             Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
             pDomino->setPosition(Point(1, 0, -1.5 * (i + 1)));
             pDomino->setVelocity(Vector(0, 0, 0));
-            pDomino->setAngularVelocity(Vector(-25, 0, 0));
+            pDomino->setAngularVelocity(Vector(0, 0, 0));
             forms_list[++number_of_forms] = pDomino;
-            allDominoes.push_back(*pDomino);
-            pDomino->setAllDominoes(allDominoes);
+            // allDominoes.push_back(ppDomino);
+            // pDomino->setAllDominoes(allDominoes);
         }
 
         //extra Domino
         Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
         pDomino->setPosition(Point(1, 0, -1.5 * 10));
-        pDomino->setVelocity(Vector(0, 0, 0));
-        pDomino->setAngularVelocity(Vector(0, 0, 0));
         forms_list[++number_of_forms] = pDomino;
-        allDominoes.push_back(*pDomino);
+        // allDominoes.push_back(*pDomino);
 
-        pDomino->setAllDominoes(allDominoes);
+        pDomino->setAngularVelocity(Vector(-50, 0, 0));
 
 
-        //Activate dominoes one after the other
-        for (int i = 0; i < numberOfDominos; i++)
-        {
-            allDominoes[i].startFalling();
-        }
 
-        // When you're done with the timer, remove it
+        // pDomino->setAllDominoes(allDominoes);
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
@@ -332,8 +326,8 @@ int main(int argc, char* args[])
         }
 
         // Timer for animation
-        Uint32 nextDominoTime = 100; // 100 ms
-        int nextDominoIndex = 0;
+        Uint32 nextDominoTime = 300; // 5 seconds
+        int nextDominoIndex = 1;
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
@@ -397,17 +391,20 @@ int main(int argc, char* args[])
             // Update the scene
             current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
             elapsed_time = current_time - previous_time;
+            elapsed_time2 = current_time - previous_time2;
             if (elapsed_time > ANIM_DELAY)
             {
-                if (elapsed_time > nextDominoTime)
+                if (elapsed_time2 > nextDominoTime)
                 {
-                    allDominoes[nextDominoIndex].startFalling();
+                    Domino *pDomino = dynamic_cast<Domino*>(forms_list[nextDominoIndex]);
+                    pDomino->setAngularVelocity(Vector(-90, 0, 0));
                     nextDominoIndex++;
-                    nextDominoTime += 1000;
-                }
 
+                    previous_time2 = current_time;
+                }
                 previous_time = current_time;
                 update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+                
 
             }
 
