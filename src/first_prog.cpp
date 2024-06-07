@@ -460,7 +460,6 @@ int main(int argc, char* args[])
                     nextDominoIndex++;
 
                     previous_time2 = current_time;
-                    std::cout << "nextDominoIndex: " << nextDominoIndex << std::endl;
                 }
                 previous_time = current_time;
                 update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
