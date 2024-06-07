@@ -290,6 +290,21 @@ Point Cuboid::checkForCollision(Cuboid c, int& ri, int& rj)
     return Point();
 }
 
+Point Cuboid::checkForCollision(Cube_face f, int &ri)
+{
+    for (int i = 0; i < 12; i++)
+    {
+        Segment s = this->getSegment(i);
+        Point intersection = f.checkForCollision(s);
+        if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
+        {
+            ri = i;
+            return intersection;
+        }
+    }
+    return Point();
+}
+
 Cube_face Cuboid::getFace(int i)
 {
     // Return the ith face of the cuboid
@@ -351,10 +366,25 @@ Segment Cuboid::getSegment(int i)
     }
 }
 
-// double Domino::getSpeedAbs()
-// {
-//     return sqrt(pow(Speed.x, 2) + pow(Speed.y, 2) + pow(Speed.z, 2));
-// }
+// function to check for collision between a domino and a cube face, and return the collision point
+// and the index of the segment of the domino that collided with the cube face
+Point Domino::checkForCollision(Cube_face f, int &ri)
+{
+    for (int i = 0; i < 12; i++)
+    {
+        Segment s = this->getSegment(i);
+        std::cout << "Checking for collision with segment " << i << std::endl;
+        std::cout << "Segment endpoints: " << s.getP1().x << " " << s.getP1().y << " " << s.getP1().z << " " << s.getP2().x << " " << s.getP2().y << " " << s.getP2().z << std::endl;
+        std::cout << "Face center: " << f.getCenter().x << " " << f.getCenter().y << " " << f.getCenter().z << std::endl;
+        Point intersection = f.checkForCollision(s);
+        if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
+        {
+            ri = i;
+            return intersection;
+        }
+    }
+    return Point();
+}
 
 void Domino::update(double delta_t)
 {
@@ -364,6 +394,7 @@ void Domino::update(double delta_t)
     auto omega = getAngularVelocity();
     auto theta = getTheta();
     auto phi = getPhi();
+    auto psi = getPsi();
 
     // Update the acceleration
     Vector a(-0.5 * v.x, -9.81, -0.5 * v.z);
@@ -379,6 +410,7 @@ void Domino::update(double delta_t)
     // Update theta and phi
     setTheta(theta + delta_t * omega.x);
     setPhi(phi + delta_t * omega.y);
+    setPsi(psi + delta_t * omega.z);
     
     // Check for collisions
     checkCollisions();
@@ -403,21 +435,11 @@ void Domino::checkCollisions()
     // collision with the ground
     if (getPosition().y < 0)
     {
-        // Adjust the position
-        Point pos = getPosition();
-        pos.y = 0;
-        setPosition(pos);
-
-        // Adjust the velocity
-        Vector velocity = getVelocity();
-        velocity.y = 0;
-        setVelocity(velocity);
-
-        // // Adjust the angular velocity
-        // Vector angularVelocity = getAngularVelocity();
-        // angularVelocity.y = 0;
-        // setAngularVelocity(angularVelocity);
+        // Handle the collision
+        Vector normal(0, 1, 0);
+        handleCollision(*this, Point(0, 0, 0), normal);
     }
+    
 
     // collision with other dominoes
     std::vector<Domino> allDominoes;
@@ -439,22 +461,7 @@ void Domino::checkCollisions()
     }
 }
 
-// function to check for collision between a domino and a cube face, and return the collision point
-// and the index of the segment of the domino that collided with the cube face
-Point Cuboid::checkForCollision(Cube_face f, int &ri)
-{
-    for (int i = 0; i < 12; i++)
-    {
-        Segment s = this->getSegment(i);
-        Point intersection = f.checkForCollision(s);
-        if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
-        {
-            ri = i;
-            return intersection;
-        }
-    }
-    return Point();
-}
+
 
 
 void Domino::render()
@@ -469,6 +476,7 @@ void Domino::render()
     double h = this->getHeight();
     double theta = this->getTheta();
     double phi = this->getPhi();
+    double psi = this->getPsi();
     Color cl = this->getColor();
 
     // Draw the domino
@@ -477,6 +485,7 @@ void Domino::render()
         glTranslated(r.x, r.y, r.z);
         glRotated(theta, v3.x, v3.y, v3.z);
         glRotated(phi, v2.x, v2.y, v2.z);
+        glRotated(psi, v1.x, v1.y, v1.z);
         glColor3f(cl.r, cl.g, cl.b);
         glBegin(GL_QUADS);
         {
@@ -518,6 +527,8 @@ void Domino::render()
         }
         glEnd();
     }
+    glPopMatrix();
+    
 }
 
 Point Domino::checkForCollision(Domino d, int &ri, int &rj)
@@ -538,6 +549,7 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
     Point r1 = this->getPosition();
     double theta1 = this->getTheta();
     double phi1 = this->getPhi();
+    double psi1 = this->getPsi();
     double l1 = this->getLength();
     double w1 = this->getWidth();
     double h1 = this->getHeight();
@@ -551,6 +563,7 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
     Point r2 = d.getPosition();
     double theta2 = d.getTheta();
     double phi2 = d.getPhi();
+    double psi2 = d.getPsi();
     double l2 = d.getLength();
     double w2 = d.getWidth();
     double h2 = d.getHeight();
@@ -621,6 +634,8 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
     phi1 = phi1 + omega1.y;
     theta2 = theta2 + omega2.x;
     phi2 = phi2 + omega2.y;
+    psi1 = psi1 + omega1.z;
+    psi2 = psi2 + omega2.z;
 
     // Set the updated values back to the Domino objects
     this->setVelocity(v1);
@@ -628,11 +643,13 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
     this->setPosition(r1);
     this->setTheta(theta1);
     this->setPhi(phi1);
+    this->setPsi(psi1);
 
     d.setVelocity(v2);
     d.setAngularVelocity(omega2);
     d.setPosition(r2);
     d.setTheta(theta2);
     d.setPhi(phi2);
+    d.setPsi(psi2);
 }
 

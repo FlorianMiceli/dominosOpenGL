@@ -214,6 +214,7 @@ private:
     Matrix3x3 momentOfInertia;
     double theta;
     double phi;
+    double psi;
     double frictionCoefficient;
     Vector acceleration;
 public:
@@ -223,7 +224,7 @@ public:
            Matrix3x3 I = Matrix3x3(), Point pos = Point(), double t = 0.0, double p = 0.0,
            double mu = 0.0)
         : Cuboid(v1, v2, v3, position, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
-          momentOfInertia(I), theta(t), phi(p), frictionCoefficient(mu), acceleration(Vector()) {}
+          momentOfInertia(I), theta(t), phi(p), psi(0.0), frictionCoefficient(mu), acceleration(Vector()) {}
 
     double getMass() const { return mass; }
     Vector getVelocity() const { return velocity; }
@@ -231,6 +232,7 @@ public:
     Matrix3x3 getMomentOfInertia() const { return momentOfInertia; }
     double getTheta() const { return theta; }
     double getPhi() const { return phi; }
+    double getPsi() const { return psi; }
     double getFrictionCoefficient() const { return frictionCoefficient; }
     Vector getAcceleration() const { return acceleration; }
 
@@ -240,10 +242,12 @@ public:
     void setMomentOfInertia(Matrix3x3 I) { momentOfInertia = I; }
     void setTheta(double t) { theta = t; }
     void setPhi(double p) { phi = p; }
+    void setPsi(double ps) { psi = ps; }
     void setFrictionCoefficient(double mu) { frictionCoefficient = mu; }
     void setAcceleration(Vector a) { acceleration = a; }
 
     Point checkForCollision(Domino d, int &ri, int &rj);
+    Point checkForCollision(Cube_face f, int &ri);
     void handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal);
     // void update(double delta_t, std::vector<Domino> &allDominoes);
     void update(double delta_t);
