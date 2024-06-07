@@ -19,7 +19,7 @@ const int SCREEN_WIDTH = 1920-1000;
 const int SCREEN_HEIGHT = 1080-500;
 
 // Max number of forms : static allocation
-const int MAX_FORMS_NUMBER = 100;
+const int MAX_FORMS_NUMBER = 10000;
 
 // Animation actualization delay (in ms) => 100 updates per second
 const Uint32 ANIM_DELAY = 10;
@@ -40,7 +40,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
-Point camera_position(0.0, 0.0, 0.0);
+Point camera_position(0.0, 0, 30);
 
 double cam_yaw = 1.5;
 double cam_pitch = 0.0;
@@ -184,23 +184,17 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form* formlist[MAX_FORMS_NUMBER])
+void render(Form *formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Initialize Modelview Matrix
-    glMatrixMode( GL_MODELVIEW );
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    Point cam_direction(0.0, 1.0, 0.0);
-
     // Set the camera position and parameters
-    double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
-    double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
-    double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
-    gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z,0.0,1.0,0.0);
-
+    gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     // Isometric view
     glRotated(-45, 0, 1, 0);
     glRotated(30, 1, 0, -1);
@@ -225,7 +219,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER])
 
     // Render the list of forms
     unsigned short i = 0;
-    while(formlist[i] != NULL)
+    while (formlist[i] != NULL)
     {
         glPushMatrix(); // Preserve the camera viewing point for further forms
         formlist[i]->render();
@@ -272,7 +266,13 @@ int main(int argc, char* args[])
         SDL_Event event;
 
         // Camera position
-        Point camera_position(0, 0.0, 10.0);
+        Point camera_position(0.0, 0, 30);
+
+        // Set the camera position and parameters
+        double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
+        double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
+        double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
+        gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z, 0.0, 1.0, 0.0);
 
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
@@ -283,26 +283,44 @@ int main(int argc, char* args[])
         }
 
         // Ground
-        Cube_face *pGround = new Cube_face(Vector(1,0,0), Vector(0,0,1), Point(-5, 0, -5), 10, 10, WHITE);
+        Cube_face *pGround = new Cube_face(Vector(-1,0,0), Vector(0,0,1), Point(-4, 0, 0), -10, -100, WHITE);
         forms_list[number_of_forms] = pGround;
 
-        Cuboid *pCuboid = NULL;
-        pCuboid = new Cuboid(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 5, 0), 1, 1, 1, BLUE);
-        // forms_list[++number_of_forms] = pCuboid;
 
-        Cuboid pCuboid2(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(0, 0, 0), 1, 1, 1, RED);
-        // forms_list[++number_of_forms] = &pCuboid2;
+        std::vector<Domino> allDominoes;
 
-        // Domino
-        Domino pDomino(Vector(1,0,0), Vector(0,0,1), Vector(0,1,0), Point(2, 5, 2), 0.2, 0.5, 1, RED, 1, Vector(0,0,0), Vector(0,0,0),
-                        Matrix3x3(), Point(2, 5, 2), 0, 0, 0);
-        //set some initial velocity
-        pDomino.setVelocity(Vector(0,0,0));
-        pDomino.setAngularVelocity(Vector(0,0,1));
-        forms_list[++number_of_forms] = &pDomino;
+        // Define the number of dominos you want to create
+        int numberOfDominos = 10;
+
+        for (int i = 0; i < 30; i++)
+        {
+            Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
+            pDomino->setPosition(Point(1, 0, -1.5 * (i + 1)));
+            pDomino->setVelocity(Vector(0, 0, 0));
+            pDomino->setAngularVelocity(Vector(-25, 0, 0));
+            forms_list[++number_of_forms] = pDomino;
+            allDominoes.push_back(*pDomino);
+            pDomino->setAllDominoes(allDominoes);
+        }
+
+        //extra Domino
+        Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
+        pDomino->setPosition(Point(1, 0, -1.5 * 10));
+        pDomino->setVelocity(Vector(0, 0, 0));
+        pDomino->setAngularVelocity(Vector(0, 0, 0));
+        forms_list[++number_of_forms] = pDomino;
+        allDominoes.push_back(*pDomino);
+
+        pDomino->setAllDominoes(allDominoes);
 
 
+        //Activate dominoes one after the other
+        for (int i = 0; i < numberOfDominos; i++)
+        {
+            allDominoes[i].startFalling();
+        }
 
+        // When you're done with the timer, remove it
 
 
         for (i=0; i<MAX_FORMS_NUMBER; i++)
@@ -312,10 +330,10 @@ int main(int argc, char* args[])
                 number_of_forms++;
             }
         }
-        
-        
-        
 
+        // Timer for animation
+        Uint32 nextDominoTime = 100; // 100 ms
+        int nextDominoIndex = 0;
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
@@ -348,11 +366,11 @@ int main(int argc, char* args[])
                         camera_position.x += step * sin(cam_yaw);
                         camera_position.z -= step * cos(cam_yaw);
                         break;
-                    case SDLK_q: 
+                    case SDLK_q:
                         camera_position.x -= step * sin(cam_yaw);
                         camera_position.z += step * cos(cam_yaw);
                         break;
-                    case SDLK_z: 
+                    case SDLK_z:
                         camera_position.x -= step * cos(cam_yaw);
                         camera_position.z -= step * sin(cam_yaw);
                         break;
@@ -360,10 +378,10 @@ int main(int argc, char* args[])
                         camera_position.x += step * cos(cam_yaw);
                         camera_position.z += step * sin(cam_yaw);
                         break;
-                    case SDLK_SPACE: 
+                    case SDLK_SPACE:
                         camera_position.y += step;
                         break;
-                    case SDLK_LSHIFT: 
+                    case SDLK_LSHIFT:
                         camera_position.y -= step;
                         break;
 
@@ -381,13 +399,20 @@ int main(int argc, char* args[])
             elapsed_time = current_time - previous_time;
             if (elapsed_time > ANIM_DELAY)
             {
+                if (elapsed_time > nextDominoTime)
+                {
+                    allDominoes[nextDominoIndex].startFalling();
+                    nextDominoIndex++;
+                    nextDominoTime += 1000;
+                }
+
                 previous_time = current_time;
-                update(forms_list, 0.1e-3 * elapsed_time); // International system units : seconds
-            
+                update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+
             }
 
             // Render the scene
-            render(forms_list);
+            render(forms_list, camera_position);
 
             // Update window screen
             SDL_GL_SwapWindow(gWindow);

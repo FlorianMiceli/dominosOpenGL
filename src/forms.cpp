@@ -6,14 +6,29 @@
 #include <algorithm>
 #include <iostream>
 
+
+void gravity(double delta_t, Animation &anim)
+{
+    double k = 0.5;
+    anim.setAccel(Vector(-k * anim.getSpeed().x, -9.81, -k * anim.getSpeed().z));
+    anim.setSpeed(Vector(anim.getSpeed().x + delta_t * anim.getAccel().x,
+                         anim.getSpeed().y + delta_t * anim.getAccel().y,
+                         anim.getSpeed().z + delta_t * anim.getAccel().z));
+    anim.setPos(Point(anim.getPos().x + delta_t * anim.getSpeed().x + 0.5 * delta_t * delta_t * anim.getAccel().x,
+                      anim.getPos().y + delta_t * anim.getSpeed().y + 0.5 * delta_t * delta_t * anim.getAccel().y,
+                      anim.getPos().z + delta_t * anim.getSpeed().z + 0.5 * delta_t * delta_t * anim.getAccel().z));
+}
+
 void solid(Animation &anim)
 {
-    if (anim.getPos().y < 0.0)
-    {
-        anim.setSpeed(Vector(anim.getSpeed().x, -anim.getSpeed().y*0.3, anim.getSpeed().z));
-        anim.setPos(Point(anim.getPos().x, -anim.getPos().y*0.3, anim.getPos().z));
-
-    }
+    double k = 0.5;
+    anim.setAccel(Vector(-k * anim.getSpeed().x, 0, -k * anim.getSpeed().z));
+    anim.setSpeed(Vector(anim.getSpeed().x + anim.getAccel().x,
+                         anim.getSpeed().y + anim.getAccel().y,
+                         anim.getSpeed().z + anim.getAccel().z));
+    anim.setPos(Point(anim.getPos().x + anim.getSpeed().x,
+                      anim.getPos().y + anim.getSpeed().y,
+                      anim.getPos().z + anim.getSpeed().z));
 }
 
 void Form::update(double delta_t)
@@ -56,7 +71,7 @@ void Segment::render()
 
 void Segment::update(double delta_t)
 {
-    anim.setPhi(anim.getPhi() + 1);
+    anim.setPhi(anim.getPhi() + 0);
 }
 
 Sphere::Sphere(double r, Color cl)
@@ -283,6 +298,7 @@ Point Cuboid::checkForCollision(Cuboid c, int& ri, int& rj)
             {
                 ri = i;
                 rj = j;
+                std::cout << "Intersection: " << intersection.x << " " << intersection.y << " " << intersection.z << std::endl;
                 return intersection;
             }
         }
@@ -337,29 +353,29 @@ Segment Cuboid::getSegment(int i)
     {
     
     case 0:
-        return Segment(anim.getPos(), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), col); // bottom right 
+        return Segment(getPosition(), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), col); // bottom right 
     case 1:
-        return Segment(anim.getPos(), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // back right
+        return Segment(getPosition(), Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z), col); // back right
     case 2:
-        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // top right
+        return Segment(Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z), Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z), col); // top right
     case 3:
-        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), col); // front right
+        return Segment(Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z), col); // front right
     case 4:
-        return Segment(Point(anim.getPos()), Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), col); // bottom back
+        return Segment(Point(getPosition()), Point(getPosition().x, getPosition().y, getPosition().z + height), col); // bottom back
     case 5:
-        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // back top
+        return Segment(Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z), Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z + height), col); // back top
     case 6:
-        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // top front
+        return Segment(Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z), Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z + height), col); // top front
     case 7:
-        return Segment(Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // top left
+        return Segment(Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z + height), Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z + height), col); // top left
     case 8:
-        return Segment(Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), Point(anim.getPos().x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), col); // back left
+        return Segment(Point(getPosition().x, getPosition().y, getPosition().z + height), Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z + height), col); // back left
     case 9:
-        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y + width * vdir2.y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // front left
+        return Segment(Point(getPosition().x + length * vdir1.x, getPosition().y + width * vdir2.y, getPosition().z + height), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z + height), col); // front left
     case 10:
-        return Segment(Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // bottom front
+        return Segment(Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z + height), col); // bottom front
     case 11:
-        return Segment(Point(anim.getPos().x, anim.getPos().y, anim.getPos().z + height), Point(anim.getPos().x + length * vdir1.x, anim.getPos().y, anim.getPos().z + height), col); // bottom left
+        return Segment(Point(getPosition().x, getPosition().y, getPosition().z + height), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z + height), col); // bottom left
     
     default:
         break;
@@ -373,9 +389,6 @@ Point Domino::checkForCollision(Cube_face f, int &ri)
     for (int i = 0; i < 12; i++)
     {
         Segment s = this->getSegment(i);
-        std::cout << "Checking for collision with segment " << i << std::endl;
-        std::cout << "Segment endpoints: " << s.getP1().x << " " << s.getP1().y << " " << s.getP1().z << " " << s.getP2().x << " " << s.getP2().y << " " << s.getP2().z << std::endl;
-        std::cout << "Face center: " << f.getCenter().x << " " << f.getCenter().y << " " << f.getCenter().z << std::endl;
         Point intersection = f.checkForCollision(s);
         if (intersection.x != 0 || intersection.y != 0 || intersection.z != 0)
         {
@@ -388,6 +401,44 @@ Point Domino::checkForCollision(Cube_face f, int &ri)
 
 void Domino::update(double delta_t)
 {
+    if (getPosition().y < 0)
+    {
+        // reverse the velocity
+        Vector v = getVelocity();
+        Vector v1 = Vector(v.x, -v.y, v.z);
+        setVelocity(v1);
+
+        // // reverse the angular velocity
+        // Vector omega = getAngularVelocity();
+        // Vector omega1 = Vector(omega.x, -0.3*omega.y, omega.z);
+        // setAngularVelocity(omega1);
+
+        // set y to 0.1
+        Point r = getPosition();
+        Point r1 = Point(r.x, 0, r.z);
+        setPosition(r1);
+    }
+
+    //if theta is lower than -90 , no update, only theta back to 90
+    if (getTheta() < -90)
+    {
+        // reverse the velocity
+        Vector v = getVelocity();
+        Vector v1 = Vector(v.x, -0.3*v.y, v.z);
+        setVelocity(v1);
+
+        // reverse the angular velocity
+        Vector omega = getAngularVelocity();
+        Vector omega1 = Vector(omega.x, -0.3*omega.y, omega.z);
+        setAngularVelocity(omega1);
+
+        // set theta to 90
+        setTheta(-90);
+    }
+
+    solid(anim);
+
+
     // Get the current state of the domino
     auto r = getPosition();
     auto v = getVelocity();
@@ -404,7 +455,12 @@ void Domino::update(double delta_t)
     Vector v1(v.x + delta_t * a.x, v.y + delta_t * a.y, v.z + delta_t * a.z);
     setVelocity(v1);
 
+    // Update angular Acceleration
+    Vector alpha(0, 0, -0.5 * omega.z);
+    setAngularAcceleration(alpha);
+
     // Update angular velocity
+    Vector omega1(omega.x + delta_t * alpha.x, omega.y + delta_t * alpha.y, omega.z + delta_t * alpha.z);
     setAngularVelocity(omega);
 
     // Update theta and phi
@@ -413,37 +469,33 @@ void Domino::update(double delta_t)
     setPsi(psi + delta_t * omega.z);
     
     // Check for collisions
-    checkCollisions();
+    checkCollisions(allDominoes);
 
     // Update the position based on speed and angular velocity
-    Point r1 = updatePosition(r, v1, delta_t, a);
-    setPosition(r1);
-
-}
-
-Point Domino::updatePosition(const Point& r, const Vector& v1, double delta_t, const Vector& animAccel)
-{
-    return Point(
-        r.x + delta_t * v1.x + 0.5 * delta_t * delta_t * animAccel.x,
-        r.y + delta_t * v1.y + 0.5 * delta_t * delta_t * animAccel.y,
-        r.z + delta_t * v1.z + 0.5 * delta_t * delta_t * animAccel.z
+    Point r1 = Point(
+        r.x + delta_t * v1.x + 0.5 * delta_t * delta_t * a.x,
+        r.y + delta_t * v1.y + 0.5 * delta_t * delta_t * a.y,
+        r.z + delta_t * v1.z + 0.5 * delta_t * delta_t * a.z
     );
+    setPosition(r1);
 }
 
-void Domino::checkCollisions()
+
+
+void Domino::checkCollisions(std::vector<Domino> allDominoes)
 {
-    // collision with the ground
-    if (getPosition().y < 0)
+    // collision with the ground which is a cube face
+    Cube_face ground = Cube_face(Vector(1, 0, 0), Vector(0, 0, 1), Point(0, 0, 0), 100, 100, Color(0.5, 0.5, 0.5));
+    int ri = -1;
+    Point collisionPoint = checkForCollision(ground, ri);
+    if (collisionPoint.x != 0 || collisionPoint.y != 0 || collisionPoint.z != 0)
     {
         // Handle the collision
-        Vector normal(0, 1, 0);
-        handleCollision(*this, Point(0, 0, 0), normal);
+        Vector normal = ground.getNormal();
+        // handleCollisionGround(ground, collisionPoint, normal);
     }
     
-
     // collision with other dominoes
-    std::vector<Domino> allDominoes;
-
     for (Domino& otherDomino : allDominoes)
     {
         if (&otherDomino == this) continue; // Skip self
@@ -461,8 +513,8 @@ void Domino::checkCollisions()
     }
 }
 
-
-
+// alldominoes is a static member of the class Domino
+std::vector<Domino> Domino::allDominoes = std::vector<Domino>();
 
 void Domino::render()
 {
@@ -479,56 +531,88 @@ void Domino::render()
     double psi = this->getPsi();
     Color cl = this->getColor();
 
-    // Draw the domino
+    // render the domino
     glPushMatrix();
+    glTranslated(r.x, r.y, r.z);
+    glRotated(theta, v1.x, v1.y, v1.z);
+    glRotated(phi, v2.x, v2.y, v2.z);
+    glRotated(psi, v3.x, v3.y, v3.z);
+    glColor3f(cl.r, cl.g, cl.b);
+    glBegin(GL_QUADS);
     {
-        glTranslated(r.x, r.y, r.z);
-        glRotated(theta, v3.x, v3.y, v3.z);
-        glRotated(phi, v2.x, v2.y, v2.z);
-        glRotated(psi, v1.x, v1.y, v1.z);
-        glColor3f(cl.r, cl.g, cl.b);
-        glBegin(GL_QUADS);
-        {
-            // Front face
-            glVertex3d(0, 0, 0);
-            glVertex3d(w, 0, 0);
-            glVertex3d(w, h, 0);
-            glVertex3d(0, h, 0);
+        // Right face
+        glVertex3d(0, 0, 0);
+        glVertex3d(l, 0, 0);
+        glVertex3d(l, 0, h);
+        glVertex3d(0, 0, h);
 
-            // Back face
-            glVertex3d(0, 0, l);
-            glVertex3d(w, 0, l);
-            glVertex3d(w, h, l);
-            glVertex3d(0, h, l);
+        // Top face
+        glVertex3d(0, 0, h);
+        glVertex3d(l, 0, h);
+        glVertex3d(l, w, h);
+        glVertex3d(0, w, h);
 
-            // Right face
-            glVertex3d(w, 0, 0);
-            glVertex3d(w, 0, l);
-            glVertex3d(w, h, l);
-            glVertex3d(w, h, 0);
+        // Left face
+        glVertex3d(0, w, h);
+        glVertex3d(l, w, h);
+        glVertex3d(l, w, 0);
+        glVertex3d(0, w, 0);
 
-            // Left face
-            glVertex3d(0, 0, 0);
-            glVertex3d(0, 0, l);
-            glVertex3d(0, h, l);
-            glVertex3d(0, h, 0);
+        // Bottom face
+        glVertex3d(0, w, 0);
+        glVertex3d(l, w, 0);
+        glVertex3d(l, 0, 0);
+        glVertex3d(0, 0, 0);
 
-            // Top face
-            glVertex3d(0, h, 0);
-            glVertex3d(w, h, 0);
-            glVertex3d(w, h, l);
-            glVertex3d(0, h, l);
+        // Front face
+        glVertex3d(l, 0, 0);
+        glVertex3d(l, 0, h);
+        glVertex3d(l, w, h);
+        glVertex3d(l, w, 0);
 
-            // Bottom face
-            glVertex3d(0, 0, 0);
-            glVertex3d(w, 0, 0);
-            glVertex3d(w, 0, l);
-            glVertex3d(0, 0, l);
-        }
-        glEnd();
+        // Back face
+        glVertex3d(0, 0, 0);
+        glVertex3d(0, 0, h);
+        glVertex3d(0, w, h);
+        glVertex3d(0, w, 0);
     }
-    glPopMatrix();
-    
+    glEnd();
+    glPopMatrix();  
+}
+
+void Domino::startFalling() {
+
+    // Set the initial velocity, angular velocity and acceleration
+    this->setAngularVelocity(Vector(0, 0, -50));
+    this->setAngularAcceleration(Vector(0, 0, -9.81));
+
+}
+
+void Domino::handleCollisionGround(Cube_face ground, Point collisionPoint, Vector collisionNormal)
+{
+    //apply opposite force to the ground
+    Vector normal = collisionNormal;
+    Vector v = this->getVelocity();
+    //apply opposite velocity to the ground
+    Vector v1 = Vector(v.x, -v.y, v.z);
+    this->setVelocity(v1);
+    //apply opposite angular velocity to the ground
+    Vector omega = this->getAngularVelocity();
+    Vector omega1 = Vector(omega.x, -omega.y, omega.z);
+    this->setAngularVelocity(omega1);
+    //apply opposite position to the ground
+    Point r = this->getPosition();
+    Point r1 = Point(r.x, -r.y, r.z);
+    this->setPosition(r1);
+    //apply opposite theta to the ground
+    double theta = this->getTheta();
+    this->setTheta(-theta);
+    //apply opposite phi to the ground
+    double phi = this->getPhi();
+    this->setPhi(-phi);
+    //apply opposite psi to the ground
+    double psi = this->getPsi();
+    this->setPsi(-psi);
 }
 
 Point Domino::checkForCollision(Domino d, int &ri, int &rj)

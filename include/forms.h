@@ -211,17 +211,19 @@ private:
     double mass;
     Vector velocity;
     Vector angularVelocity;
+    Vector angularAcceleration;
     Matrix3x3 momentOfInertia;
     double theta;
     double phi;
     double psi;
     double frictionCoefficient;
     Vector acceleration;
+    static std::vector<Domino> allDominoes;
 public:
     Domino(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
-           Point position = Point(), double l = 1.0, double w = 1.0, double h = 1.0,
+           Point position = Point(0,0,0), double l = 1.0, double w = 1.0, double h = 1.0,
            Color cl = Color(), double m = 1.0, Vector v = Vector(), Vector omega = Vector(),
-           Matrix3x3 I = Matrix3x3(), Point pos = Point(), double t = 0.0, double p = 0.0,
+           Matrix3x3 I = Matrix3x3(), double t = 0.0, double p = 0.0,
            double mu = 0.0)
         : Cuboid(v1, v2, v3, position, l, w, h, cl), mass(m), velocity(v), angularVelocity(omega),
           momentOfInertia(I), theta(t), phi(p), psi(0.0), frictionCoefficient(mu), acceleration(Vector()) {}
@@ -235,6 +237,9 @@ public:
     double getPsi() const { return psi; }
     double getFrictionCoefficient() const { return frictionCoefficient; }
     Vector getAcceleration() const { return acceleration; }
+    std::vector<Domino> getAllDominoes() { return allDominoes; }
+    void handleCollisionGround(Cube_face, Point, Vector);
+    Vector getAngularAcceleration() const { return angularAcceleration; }
 
     void setMass(double m) { mass = m; }
     void setVelocity(Vector v) { velocity = v; }
@@ -245,16 +250,19 @@ public:
     void setPsi(double ps) { psi = ps; }
     void setFrictionCoefficient(double mu) { frictionCoefficient = mu; }
     void setAcceleration(Vector a) { acceleration = a; }
+    void setAllDominoes(std::vector<Domino> dominoes) { allDominoes = dominoes; }
+    void setAngularAcceleration(Vector a) { angularAcceleration = a; }
 
     Point checkForCollision(Domino d, int &ri, int &rj);
     Point checkForCollision(Cube_face f, int &ri);
     void handleCollision(Domino &d, const Point &collisionPoint, const Vector &collisionNormal);
-    // void update(double delta_t, std::vector<Domino> &allDominoes);
     void update(double delta_t);
+    void checkCollisions(std::vector<Domino> allDominoes);
     Point updatePosition(const Point &r, const Vector &v1, double delta_t, const Vector &animAccel);
-    void checkCollisions();
     void render();
+    void startFalling();
 };
+
 
 
 
