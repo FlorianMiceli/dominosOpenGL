@@ -41,7 +41,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
-Point camera_position(0.0, 0, 30);
+Point camera_position(0.0, 0.0, 0.0);
 
 double cam_yaw = 1.5;
 double cam_pitch = 0.0;
@@ -185,7 +185,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     }
 }
 
-void render(Form *formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
+void render(Form *formlist[MAX_FORMS_NUMBER])
 {
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -195,7 +195,11 @@ void render(Form *formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
     glLoadIdentity();
 
     // Set the camera position and parameters
-    gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    // Set the camera position and parameters
+    double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
+    double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
+    double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
+    gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z,0.0,1.0,0.0);
     // Isometric view
     glRotated(-45, 0, 1, 0);
     glRotated(30, 1, 0, -1);
@@ -312,7 +316,7 @@ int main(int argc, char* args[])
         SDL_Event event;
 
         // Camera position
-        Point camera_position(0.0, 0, 30);
+        Point cam_direction(0.0, 1.0, 0.0);
 
         // Set the camera position and parameters
         double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
@@ -469,7 +473,7 @@ int main(int argc, char* args[])
             }
 
             // Render the scene
-            render(forms_list, camera_position);
+            render(forms_list);
 
             // Update window screen
             SDL_GL_SwapWindow(gWindow);
