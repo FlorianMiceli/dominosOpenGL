@@ -122,21 +122,32 @@ void Cube_face::render()
 {
     Point p1 = Point();
     Point p2 = p1, p3, p4 = p1;
-    p2.translate(length*vdir1);
+    p2.translate(length * vdir1);
     p3 = p2;
-    p3.translate(width*vdir2);
-    p4.translate(width*vdir2);
+    p3.translate(width * vdir2);
+    p4.translate(width * vdir2);
+
+    // Autorisation de la texture choisie a la creation de la face (cf main())
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
 
     Form::render();
 
     glBegin(GL_QUADS);
     {
+        glTexCoord2f(p1.x, p1.y);
         glVertex3d(p1.x, p1.y, p1.z);
+        glTexCoord2f(p2.x, p2.y);
         glVertex3d(p2.x, p2.y, p2.z);
+        glTexCoord2f(p3.x, p3.y);
         glVertex3d(p3.x, p3.y, p3.z);
+        glTexCoord2f(p4.x, p4.y);
         glVertex3d(p4.x, p4.y, p4.z);
     }
     glEnd();
+
+    // Ne plus appliquer la texture pour la suite
+    glDisable(GL_TEXTURE_2D);
 }
 
 Vector Cube_face::getNormal()
@@ -163,7 +174,7 @@ Point Cube_face::checkForCollision(Segment s)
     Vector v2 = vdir2;
     double l = length;
     double w = width;
-    
+
     // Calculate plane normal
     Vector n = v1.cross(v2);
     double d = -n.x * face_center.x - n.y * face_center.y - n.z * face_center.z;
@@ -242,7 +253,7 @@ void Cuboid::render()
 
     Form::render();
 
-    
+
     glBegin(GL_QUADS);
     {
         // Right face
@@ -281,7 +292,7 @@ void Cuboid::render()
         glVertex3d(p7.x, p7.y, p7.z);
         glVertex3d(p3.x, p3.y, p3.z);
     }
-    
+
     glEnd();
 }
 
@@ -351,9 +362,9 @@ Segment Cuboid::getSegment(int i)
     //show vdir1, vdir2, vdir3, length, width, height
     switch (i)
     {
-    
+
     case 0:
-        return Segment(getPosition(), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), col); // bottom right 
+        return Segment(getPosition(), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), col); // bottom right
     case 1:
         return Segment(getPosition(), Point(getPosition().x, getPosition().y + width * vdir2.y, getPosition().z), col); // back right
     case 2:
@@ -376,7 +387,7 @@ Segment Cuboid::getSegment(int i)
         return Segment(Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z + height), col); // bottom front
     case 11:
         return Segment(Point(getPosition().x, getPosition().y, getPosition().z + height), Point(getPosition().x + length * vdir1.x, getPosition().y, getPosition().z + height), col); // bottom left
-    
+
     default:
         break;
     }
@@ -467,7 +478,7 @@ void Domino::update(double delta_t)
     setTheta(theta + delta_t * omega.x);
     setPhi(phi + delta_t * omega.y);
     setPsi(psi + delta_t * omega.z);
-    
+
     // Check for collisions
     checkCollisions(allDominoes);
 
@@ -479,6 +490,7 @@ void Domino::update(double delta_t)
     );
     setPosition(r1);
 }
+
 
 
 
@@ -494,7 +506,7 @@ void Domino::checkCollisions(std::vector<Domino> allDominoes)
         Vector normal = ground.getNormal();
         // handleCollisionGround(ground, collisionPoint, normal);
     }
-    
+
     // collision with other dominoes
     for (Domino& otherDomino : allDominoes)
     {
@@ -531,6 +543,9 @@ void Domino::render()
     double psi = this->getPsi();
     Color cl = this->getColor();
 
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
     // render the domino
     glPushMatrix();
     glTranslated(r.x, r.y, r.z);
@@ -541,43 +556,67 @@ void Domino::render()
     glBegin(GL_QUADS);
     {
         // Right face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(0, 0, 0);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(l, 0, 0);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(l, 0, h);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(0, 0, h);
 
         // Top face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(0, 0, h);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(l, 0, h);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(l, w, h);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(0, w, h);
 
         // Left face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(0, w, h);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(l, w, h);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(l, w, 0);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(0, w, 0);
 
         // Bottom face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(0, w, 0);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(l, w, 0);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(l, 0, 0);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(0, 0, 0);
 
         // Front face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(l, 0, 0);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(l, 0, h);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(l, w, h);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(l, w, 0);
 
         // Back face
+        glTexCoord3f(0, 0, 0);
         glVertex3d(0, 0, 0);
+        glTexCoord3f(1, 0, 0);
         glVertex3d(0, 0, h);
+        glTexCoord3f(1, 1, 0);
         glVertex3d(0, w, h);
+        glTexCoord3f(0, 1, 0);
         glVertex3d(0, w, 0);
     }
     glEnd();
-    glPopMatrix();  
+    glPopMatrix();
 }
 
 void Domino::startFalling() {
@@ -673,7 +712,7 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
     Vector v_rel_t = v_rel - v_rel_n;
 
     // Coefficient of restitution
-    double e = 0.95; 
+    double e = 0.95;
 
     // Calculate the inverse of the moment of inertia for both dominos
     Matrix3x3 I1_inv = I1.inverse();
@@ -709,12 +748,12 @@ void Domino::handleCollision(Domino &d, const Point &collisionPoint, const Vecto
 
     // Update the angular velocities
     omega1 = omega1 + I1_inv * (rc_minus_r1.cross(Jn));
-    omega2 = omega2 - I2_inv * (rc_minus_r2.cross(Jn)); 
+    omega2 = omega2 - I2_inv * (rc_minus_r2.cross(Jn));
 
     // Update the positions
     r1 = r1 + Jn / m1 * n;
-    r2 = r2 - Jn / m2 * n;  
-    
+    r2 = r2 - Jn / m2 * n;
+
     // Update the angular positions
     theta1 = theta1 + omega1.x;
     phi1 = phi1 + omega1.y;

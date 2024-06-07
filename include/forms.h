@@ -153,6 +153,7 @@ private:
     Vector vdir1, vdir2;
     double length, width;
     Point org;
+    GLuint texture_id;
 public:
     Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,1,0),
               Point org = Point(), double l = 1.0, double w = 1.0, Color cl = Color());
@@ -163,6 +164,7 @@ public:
     void update(double delta_t);
     void render();
     Vector getNormal();
+    void setTexture(GLuint textureid) {texture_id = textureid;}
 };
 
 // A cuboid (for dominoes)
@@ -219,6 +221,7 @@ private:
     double frictionCoefficient;
     Vector acceleration;
     static std::vector<Domino> allDominoes;
+    GLuint texture_id;
 public:
     Domino(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1), Vector v3 = Vector(0,1,0),
            Point position = Point(0,0,0), double l = 1.0, double w = 1.0, double h = 1.0,
@@ -240,6 +243,8 @@ public:
     std::vector<Domino> getAllDominoes() { return allDominoes; }
     void handleCollisionGround(Cube_face, Point, Vector);
     Vector getAngularAcceleration() const { return angularAcceleration; }
+    void setTexture(GLuint textureid) {texture_id = textureid;}
+
 
     void setMass(double m) { mass = m; }
     void setVelocity(Vector v) { velocity = v; }

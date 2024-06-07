@@ -4064,7 +4064,7 @@
 	<cmath>
 	"geometry.h"
 
-1717751274 source:c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\src\forms.cpp
+1717755945 source:c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\src\forms.cpp
 	<cmath>
 	<SDL2/SDL_opengl.h>
 	<GL/GLU.h>
@@ -4104,17 +4104,18 @@
 	<stdint.h>
 	<inttypes.h>
 
-1717752165 c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\include\forms.h
+1717753574 c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\include\forms.h
 	"geometry.h"
 	"animation.h"
 	<vector>
 
-1717752359 source:c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\src\first_prog.cpp
+1717756414 source:c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\src\first_prog.cpp
 	<iostream>
 	<cmath>
 	<SDL2/SDL.h>
 	<SDL2/SDL_opengl.h>
 	<GL/GLU.h>
+	<SDL2/SDL_image.h>
 	"geometry.h"
 	"forms.h"
 
@@ -4904,6 +4905,12 @@
 
 1650910406 g:\mon drive\travail\cycle ingé\s5\info\projet transverse\prjsupport_codeblocks20tpopengl_pr_eleves\include\sdl2\sdl_misc.h
 	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1717590816 c:\users\esteb\onedrive\documents\polytech\projet inter-20240531t120428z-001\projet inter\falling-dominos-opengl\include\sdl2\sdl_image.h
+	"SDL.h"
+	"SDL_version.h"
 	"begin_code.h"
 	"close_code.h"
 

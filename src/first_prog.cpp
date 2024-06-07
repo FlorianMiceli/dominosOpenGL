@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <GL/GLU.h>
+#include <SDL2/SDL_image.h>
 
 // Module for space geometry
 #include "geometry.h"
@@ -238,6 +239,50 @@ void close(SDL_Window** window)
     SDL_Quit();
 }
 
+int createTextureFromImage(const char *filename, GLuint *textureID)
+{
+    SDL_Surface *imgSurface = IMG_Load(filename);
+    if (imgSurface == NULL)
+    {
+        std::cerr << "Failed to load texture image: " << filename << std::endl;
+        return -1;
+    }
+    else
+    {
+        // Work out what format to tell glTexImage2D to use...
+        int mode;
+        if (imgSurface->format->BytesPerPixel == 3) // RGB 24bit
+        {
+            mode = GL_RGB;
+        }
+        else if (imgSurface->format->BytesPerPixel == 4) // RGBA 32bit
+        {
+            mode = GL_RGBA;
+        }
+        else
+        {
+            SDL_FreeSurface(imgSurface);
+            std::cerr << "Unable to detect the image color format of: " << filename << std::endl;
+            return -2;
+        }
+        // create one texture name
+        glGenTextures(1, textureID);
+
+        // tell opengl to use the generated texture name
+        glBindTexture(GL_TEXTURE_2D, *textureID);
+
+        // this reads from the sdl imgSurface and puts it into an openGL texture
+        glTexImage2D(GL_TEXTURE_2D, 0, mode, imgSurface->w, imgSurface->h, 0, mode, GL_UNSIGNED_BYTE, imgSurface->pixels);
+
+        // these affect how this texture is drawn later on...
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // clean up
+        SDL_FreeSurface(imgSurface);
+        return 0;
+    }
+}
 
 /***************************************************************************/
 /* MAIN Function                                                           */
@@ -275,6 +320,13 @@ int main(int argc, char* args[])
         double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
         gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z, 0.0, 1.0, 0.0);
 
+        // Textures creation //////////////////////////////////////////////////////////
+        GLuint textureid_1, textureid_2, textureid_3;
+        createTextureFromImage("resources/images/domino2.jpg", &textureid_1);
+        createTextureFromImage("resources/images/sol.jpg", &textureid_2);
+        createTextureFromImage("resources/images/professeur.jpg", &textureid_3);
+        // Textures ready to be enabled (with private member " texture_id" of each form)
+
         // The forms to render
         Form* forms_list[MAX_FORMS_NUMBER];
         unsigned short number_of_forms = 0, i;
@@ -283,19 +335,26 @@ int main(int argc, char* args[])
             forms_list[i] = NULL;
         }
 
+        int createTextureFromImage(const char *filename, GLuint *textureid_1);
+
         // Ground
         Cube_face *pGround = new Cube_face(Vector(-1,0,0), Vector(0,0,1), Point(-4, 0, 0), -10, -100, WHITE);
+        pGround->setTexture(textureid_2);
         forms_list[number_of_forms] = pGround;
 
+        // Cube face for background
+        Cube_face *pBackground = NULL;
+        pBackground = new Cube_face(Vector(0,0,1), Vector(0,1,0), Point(-5, 0, -10), -10, 10, WHITE);
+        pBackground->setTexture(textureid_3);
+        forms_list[++number_of_forms] = pBackground;
 
         std::vector<Domino> allDominoes;
 
-        // Define the number of dominos you want to create
-        int numberOfDominos = 10;
 
         for (int i = 0; i < 30; i++)
         {
-            Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
+            Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, WHITE);
+            pDomino->setTexture(textureid_1);
             pDomino->setPosition(Point(1, 0, -1.5 * (i + 1)));
             pDomino->setVelocity(Vector(0, 0, 0));
             pDomino->setAngularVelocity(Vector(0, 0, 0));
@@ -305,12 +364,12 @@ int main(int argc, char* args[])
         }
 
         //extra Domino
-        Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
-        pDomino->setPosition(Point(1, 0, -1.5 * 10));
-        forms_list[++number_of_forms] = pDomino;
+        // Domino *pDomino = new Domino(Vector(1,0,0), Vector(0,1,0), Vector(0,0,1), Point(1, 5, 10), 1, 2, 0.4, PURPLE);
+        // pDomino->setPosition(Point(1, 0, -1.5 * 10));
+        // forms_list[++number_of_forms] = pDomino;
         // allDominoes.push_back(*pDomino);
 
-        pDomino->setAngularVelocity(Vector(-50, 0, 0));
+        // pDomino->setAngularVelocity(Vector(-50, 0, 0));
 
 
 
@@ -327,7 +386,7 @@ int main(int argc, char* args[])
 
         // Timer for animation
         Uint32 nextDominoTime = 300; // 5 seconds
-        int nextDominoIndex = 1;
+        int nextDominoIndex = 2;
 
         // Get first "current time"
         previous_time = SDL_GetTicks();
@@ -394,13 +453,14 @@ int main(int argc, char* args[])
             elapsed_time2 = current_time - previous_time2;
             if (elapsed_time > ANIM_DELAY)
             {
-                if (elapsed_time2 > nextDominoTime)
+                if (elapsed_time2 > nextDominoTime && nextDominoIndex < 32)
                 {
                     Domino *pDomino = dynamic_cast<Domino*>(forms_list[nextDominoIndex]);
                     pDomino->setAngularVelocity(Vector(-90, 0, 0));
                     nextDominoIndex++;
 
                     previous_time2 = current_time;
+                    std::cout << "nextDominoIndex: " << nextDominoIndex << std::endl;
                 }
                 previous_time = current_time;
                 update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
