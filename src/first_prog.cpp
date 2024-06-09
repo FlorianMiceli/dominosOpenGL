@@ -41,7 +41,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos);
 // Frees media and shuts down SDL
 void close(SDL_Window** window);
 
-Point camera_position(0.0, 0.0, 0.0);
+Point camera_position(5, 5, 5);
 
 double cam_yaw = 1.5;
 double cam_pitch = 0.0;
@@ -322,7 +322,7 @@ int main(int argc, char* args[])
         double cam_x = camera_position.x + cam_dist * cos(cam_pitch) * cos(cam_yaw);
         double cam_y = camera_position.y + cam_dist * sin(cam_pitch);
         double cam_z = camera_position.z + cam_dist * cos(cam_pitch) * sin(cam_yaw);
-        gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z, 0.0, 1.0, 0.0);
+        gluLookAt(cam_x, cam_y, cam_z, camera_position.x, camera_position.y, camera_position.z, 0.0, 5.0, 0.0);
 
         // Textures creation //////////////////////////////////////////////////////////
         GLuint textureid_1, textureid_2, textureid_3;
